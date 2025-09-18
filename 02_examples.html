@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Google Earth Engine — 5 Testable Geostatistics Tasks (EN) — University of Szeged</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --accent:#2563eb; --accent-2:#22d3ee; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --code-bg:#0b1220; --code-ink:#e6ebf5; --badge:#eef2ff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
+      --accent:#60a5fa; --accent-2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
+      --code-bg:#0a0f1c; --code-ink:#e6ebf5; --badge:#1e293b;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+       font:16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";}
+  .wrap{max-width:1100px; margin-inline:auto}
+
+  /* HEADER */
+  header{
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase;
+         background: rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+         padding:.25rem .5rem; border-radius:999px}
+  h1{margin:0; font-size:1.35rem; font-weight:700}
+  h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
+  .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .logo-chip{display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.35rem .5rem; box-shadow:var(--shadow)}
+  .logo-chip img{display:block; height:42px; width:auto; object-fit:contain}
+  .logo-chip.logo-dept img{height:55px}
+  .logo-chip.logo-szte img{height:42px}
+
+  /* HERO */
+  .hero{
+    margin-top:1rem; border-radius:16px; overflow:hidden; box-shadow:var(--shadow);
+    border:1px solid var(--border); background:
+      radial-gradient(80% 120% at 0% 100%, rgba(34,211,238,.18), transparent 55%),
+      radial-gradient(80% 120% at 100% 0%, rgba(37,99,235,.18), transparent 55%),
+      linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #1e293b 100%);
+    color:#fff; position:relative;
+  }
+  .hero-inner{padding:2.25rem 1.25rem}
+  .hero h3{margin:.2rem 0 0; font-size:1.15rem; font-weight:600; opacity:.95}
+  .hero .pill{
+    display:inline-flex; gap:.5rem; align-items:center;
+    background: rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32);
+    border-radius:999px; padding:.35rem .6rem; font-weight:600; letter-spacing:.02em;
+  }
+  .hero .blurb{margin-top:.6rem; opacity:.95}
+
+  /* CARDS & CONTENT */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; margin-top:1rem; box-shadow:var(--shadow); overflow:hidden}
+  .bar{padding:.9rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .subtitle{font-weight:600}
+  .btn{border:1px solid var(--border); background:transparent; color:var(--ink); padding:.45rem .7rem; border-radius:10px; cursor:pointer; font-weight:600}
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .hint{color:var(--muted); font-size:.92rem}
+
+  .section{padding:1rem}
+  h3{margin:0 0 .35rem; font-size:1.05rem}
+  ol{margin:.25rem 0 .75rem 1.2rem}
+  ul{margin:.2rem 0 .6rem 1.2rem}
+  .callout{
+    background:rgba(2,6,23,.04); border:1px solid var(--border); border-radius:12px;
+    padding:.75rem .9rem; margin:.6rem 0; color:var(--ink)
+  }
+  .note{color:var(--muted); font-size:.95rem}
+  a{color:var(--accent); text-decoration:none} a:hover{text-decoration:underline}
+
+  /* CODE */
+  pre{margin:.6rem 0; background:var(--code-bg); color:var(--code-ink); padding:1rem; border-radius:12px; overflow:auto; border:1px solid #0f274a}
+  code, kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+  .codebar{display:flex; justify-content:space-between; align-items:center; gap:.5rem; margin-top:.25rem}
+  .code-title{font-size:.92rem; color:var(--muted)}
+  .copy{border:1px solid rgba(255,255,255,.25); color:#fff; background:transparent; padding:.25rem .55rem; border-radius:8px; cursor:pointer}
+  .copy:hover{background:rgba(255,255,255,.08)}
+
+  /* FOOTNOTES */
+  .footnotes{padding:1rem; font-size:.95rem}
+  .footnotes li{margin:.25rem 0}
+  .kbd{background:var(--badge); border:1px solid var(--border); padding:.05rem .35rem; border-radius:6px; font-weight:700}
+
+  @media (max-width:720px){
+    body{padding:1rem}
+    h1{font-size:1.2rem}
+    .logo-chip img{height:38px}
+    .logo-chip.logo-dept img{height:48px}
+  }
+
+  /* PRINT */
+  @media print{
+    .btn{display:none}
+    a[href]:after{content:""}
+  }
+</style>
+<script>
+  function printPage(){ window.print(); }
+  function copyCode(id){
+    const el = document.getElementById(id);
+    if (!el) return;
+    const txt = el.innerText;
+    navigator.clipboard.writeText(txt).then(()=>{
+      const b = document.querySelector(`[data-copy="${id}"]`);
+      if (b){ const old=b.textContent; b.textContent='Copied'; setTimeout(()=>b.textContent=old, 1200); }
+    });
+  }
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-top">
+        <div class="title">
+          <span class="badge">University of Szeged</span>
+          <h1>GEE Geostatistics — Five Beginner‑Friendly, Testable Tasks (English)</h1>
+        </div>
+        <div class="logo-row" aria-label="Department and University logos">
+          <span class="logo-chip logo-dept" title="Department logo">
+            <img src="https://geosci.u-szeged.hu/site/upload/2024/10/logo_v2_2_64x55.png" alt="Department of Atmospheric and Geospatial Data Science logo" />
+          </span>
+          <span class="logo-chip logo-szte" title="SZTE logo">
+            <img src="https://u-szeged.hu/site/design3/img/szte_logo_en.jpg" alt="University of Szeged logo (English)" />
+          </span>
+        </div>
+      </div>
+      <h2>Department of Atmospheric and Geospatial Data Science</h2>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero" aria-label="GEE geostatistics lab banner">
+      <div class="hero-inner">
+        <span class="pill">🌍 Google Earth Engine • Lab 01 • Testable Tasks</span>
+        <h3>From drawing an ROI to exporting NDVI samples — short, objective, and verifiable</h3>
+        <p class="blurb">
+          Each task has a clear <strong>Goal → Steps → Pass check</strong>, plus a single
+          <strong>all‑in‑one code cell</strong> you can paste into the Code Editor to verify your work.
+        </p>
+      </div>
+    </section>
+
+    <!-- HOW TO USE -->
+    <section class="card" aria-labelledby="howto">
+      <div class="bar">
+        <div><span id="howto" class="subtitle">How to use & grading</span></div>
+        <div><button class="btn" onclick="printPage()">Print</button></div>
+      </div>
+      <div class="section">
+        <ul>
+          <li>Open <a href="#ref1"><strong>code.earthengine.google.com</strong></a>, create a <em>New Script</em>, and complete Tasks 1–5.</li>
+          <li>Then paste the <strong>All‑in‑one verification code</strong> below to confirm everything works.</li>
+        </ul>
+        <div class="callout">
+          <strong>Grading (quick & objective):</strong> Each item = <strong>20 points</strong> (total 100).
+          See the rubric at the end of the page.
+        </div>
+      </div>
+    </section>
+
+    <!-- TASK 1 -->
+    <section class="card" aria-labelledby="t1">
+      <div class="bar"><div><span id="t1" class="subtitle">1) Draw a study polygon (ROI) and report its area</span></div></div>
+      <div class="section">
+        <p><strong>Goal:</strong> Make a region of interest and compute basic geometry stats (area, perimeter).</p>
+        <h3>Steps</h3>
+        <ol>
+          <li>Open <strong>code.earthengine.google.com</strong> → <em>New Script</em>.</li>
+          <li>Use the <strong>Geometry drawing tool</strong> (left toolbar) to draw a polygon (your study area).</li>
+          <li>In the <strong>Imports</strong> panel, rename the default <code>geometry</code> to <strong><code>roi</code></strong>.</li>
+          <li>Compute area (ha) and perimeter (km) and print to Console.</li>
+        </ol>
+        <h3>Pass check</h3>
+        <ul>
+          <li>Console shows <em>ROI area (ha)</em> and <em>perimeter (km)</em> (positive numbers).</li>
+          <li>Map centers on your polygon.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- TASK 2 -->
+    <section class="card" aria-labelledby="t2">
+      <div class="bar"><div><span id="t2" class="subtitle">2) Load cloud‑filtered Sentinel‑2, visualize true color</span></div></div>
+      <div class="section">
+        <p><strong>Goal:</strong> Bring in a satellite collection, filter it (date, place, clouds), and view it.</p>
+        <h3>Steps</h3>
+        <ol>
+          <li>Load <code>COPERNICUS/S2_SR</code>.</li>
+          <li>Filter by date (e.g., one growing season), <code>bounds=roi</code>, and <code>CLOUDY_PIXEL_PERCENTAGE ≤ 20</code>.</li>
+          <li>Apply a simple QA60 cloud mask and take a median mosaic.</li>
+          <li>Add an RGB layer to Map.</li>
+        </ol>
+        <h3>Pass check</h3>
+        <ul>
+          <li>A natural‑color image appears roughly matching your ROI.</li>
+          <li>No obvious cloud streaks (masking worked “well enough”).</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- TASK 3 -->
+    <section class="card" aria-labelledby="t3">
+      <div class="bar"><div><span id="t3" class="subtitle">3) Create NDVI and <em>use the polygon</em> to clip & display</span></div></div>
+      <div class="section">
+        <p><strong>Goal:</strong> Derive NDVI and <em>use your polygon</em> to clip the output to the study area.</p>
+        <h3>Steps</h3>
+        <ol>
+          <li>Compute NDVI = (B8 − B4) / (B8 + B4).</li>
+          <li><code>clip(roi)</code> so only your polygon is colored.</li>
+          <li>Add NDVI to the Map with a sensible palette and range.</li>
+        </ol>
+        <h3>Pass check</h3>
+        <ul>
+          <li>NDVI layer shows only within your polygon.</li>
+          <li>Legend min/max (0–1) yields reasonable vegetation contrast.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- TASK 4 -->
+    <section class="card" aria-labelledby="t4">
+      <div class="bar"><div><span id="t4" class="subtitle">4) Zonal statistics + distribution inside the polygon</span></div></div>
+      <div class="section">
+        <p><strong>Goal:</strong> Produce descriptive statistics and a distribution view for NDVI within <code>roi</code>.</p>
+        <h3>Steps</h3>
+        <ol>
+          <li><code>reduceRegion</code> over <code>roi</code> to compute mean, stdDev, min, max, and percentiles.</li>
+          <li>Plot a <strong>histogram</strong> of NDVI inside <code>roi</code> with <code>ui.Chart.image.histogram</code>.</li>
+          <li>(Optional bonus) Build a <strong>monthly NDVI time series</strong> over the same ROI.</li>
+        </ol>
+        <h3>Pass check</h3>
+        <ul>
+          <li>Console prints a stats dictionary with expected keys (mean, stdDev, min, max, p25/p50/p75).</li>
+          <li>A visible histogram chart appears; optional time‑series chart also renders.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- TASK 5 -->
+    <section class="card" aria-labelledby="t5">
+      <div class="bar"><div><span id="t5" class="subtitle">5) Sample NDVI at random points and export results</span></div></div>
+      <div class="section">
+        <p><strong>Goal:</strong> Generate point samples for geostatistical work (e.g., histograms, kriging in R/QGIS).</p>
+        <h3>Steps</h3>
+        <ol>
+          <li>Create ~200 random points <strong>inside</strong> your ROI.</li>
+          <li>Use <code>sampleRegions</code> to extract NDVI values at those points.</li>
+          <li><strong>Export</strong> the table to Google Drive (CSV) and (optionally) export the clipped NDVI raster.</li>
+        </ol>
+        <h3>Pass check</h3>
+        <ul>
+          <li>Console shows a FeatureCollection preview (first rows).</li>
+          <li>In the <strong>Tasks/Exports</strong> panel, you can click <strong>Run</strong>; export completes to Drive with CSV and/or GeoTIFF.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ALL-IN-ONE CODE -->
+    <section class="card" aria-labelledby="code">
+      <div class="bar">
+        <div><span id="code" class="subtitle">All‑in‑one verification code (JavaScript — Earth Engine Code Editor)</span></div>
+        <div class="hint">Draw a polygon and rename it to <code>roi</code> in Imports, or uncomment the sample ROI in the code.</div>
+      </div>
+      <div class="section">
+        <div class="codebar">
+          <span class="code-title">Paste into <strong>code.earthengine.google.com</strong> and click <span class="kbd">Run</span></span>
+          <button class="copy" data-copy="js-all" onclick="copyCode('js-all')">Copy</button>
+        </div>
+<pre id="js-all"><code>// ===== 0) ROI (Region of Interest) =====
+// If you drew a polygon, rename it to 'roi' in the left Imports panel.
+// Otherwise, you can define one programmatically like this:
+// var roi = ee.Geometry.Polygon([
+//   [[44.345, 33.312], [44.445, 33.312], [44.445, 33.382], [44.345, 33.382]]
+// ]);
+
+Map.centerObject(roi, 11);
+Map.addLayer(roi, {color: 'red'}, 'ROI');
+
+// Report area & perimeter
+var area_ha = roi.area().divide(10000);    // m² -> hectares
+var perim_km = roi.perimeter().divide(1000); // m -> kilometers
+print('ROI area (ha):', area_ha);
+print('ROI perimeter (km):', perim_km);
+
+// ===== 1) Sentinel‑2 load, filter, cloud mask =====
+function maskS2clouds(image) {
+  var qa = image.select('QA60');
+  var cloudBitMask  = 1 &lt;&lt; 10;
+  var cirrusBitMask = 1 &lt;&lt; 11;
+  var mask = qa.bitwiseAnd(cloudBitMask).eq(0)
+               .and(qa.bitwiseAnd(cirrusBitMask).eq(0));
+  return image.updateMask(mask).copyProperties(image, ['system:time_start']);
+}
+
+var s2 = ee.ImageCollection('COPERNICUS/S2_SR')
+  .filterDate('2024-05-01', '2024-09-30')        // choose your season
+  .filterBounds(roi)
+  .filter(ee.Filter.lte('CLOUDY_PIXEL_PERCENTAGE', 20))
+  .map(maskS2clouds);
+
+var s2Median = s2.median();
+Map.addLayer(
+  s2Median.clip(roi),
+  {bands: ['B4','B3','B2'], min: 0, max: 3000},
+  'Sentinel‑2 RGB (median)'
+);
+
+// ===== 2) NDVI and clip to polygon =====
+var ndvi = s2Median.normalizedDifference(['B8', 'B4']).rename('NDVI');
+Map.addLayer(
+  ndvi.clip(roi),
+  {min: 0, max: 1, palette: ['white', 'yellow', 'green']},
+  'NDVI (clipped to ROI)'
+);
+
+// ===== 3) Zonal stats & histogram inside ROI =====
+var stats = ndvi.reduceRegion({
+  reducer: ee.Reducer.mean()
+    .combine({reducer2: ee.Reducer.stdDev(), sharedInputs: true})
+    .combine({reducer2: ee.Reducer.minMax(), sharedInputs: true})
+    .combine({reducer2: ee.Reducer.percentile([25,50,75]), sharedInputs: true}),
+  geometry: roi,
+  scale: 10,
+  bestEffort: true,
+  maxPixels: 1e9
+});
+print('NDVI stats in ROI:', stats);
+
+// Histogram (50 bins)
+var hist = ui.Chart.image.histogram(ndvi, roi, 10, 50)
+  .setOptions({title: 'NDVI histogram in ROI', hAxis:{title:'NDVI'}, vAxis:{title:'Frequency'}});
+print(hist);
+
+// (Optional) Monthly NDVI time series for one year
+var year = 2024;
+var months = ee.List.sequence(1, 12);
+var monthly = ee.ImageCollection.fromImages(
+  months.map(function(m) {
+    var start = ee.Date.fromYMD(year, ee.Number(m), 1);
+    var end   = start.advance(1, 'month');
+    var ndviMonthly = ee.ImageCollection('COPERNICUS/S2_SR')
+      .filterDate(start, end)
+      .filterBounds(roi)
+      .filter(ee.Filter.lte('CLOUDY_PIXEL_PERCENTAGE', 20))
+      .map(maskS2clouds).median()
+      .normalizedDifference(['B8','B4']).rename('NDVI')
+      .set('system:time_start', start.millis());
+    return ndviMonthly;
+  })
+);
+var ts = ui.Chart.image.series({
+  imageCollection: monthly,
+  region: roi,
+  reducer: ee.Reducer.mean(),
+  scale: 10,
+  maxPixels: 1e9
+}).setOptions({title: 'Monthly mean NDVI in ROI (' + year + ')',
+               vAxis: {title: 'NDVI'}, hAxis: {title: 'Date'}});
+print(ts);
+
+// ===== 4) Random point sampling & exports =====
+var pts = ee.FeatureCollection.randomPoints(roi, 200, 42); // N=200, seed=42
+Map.addLayer(pts, {color: 'black'}, 'Random points');
+
+var samples = ndvi.sampleRegions({
+  collection: pts,
+  properties: [],  // keep only geometry by default
+  scale: 10
+});
+print('Sample of NDVI point table:', samples.limit(5));
+
+// Export table (CSV) to Google Drive
+Export.table.toDrive({
+  collection: samples,
+  description: 'NDVI_samples_ROI',
+  fileFormat: 'CSV'
+});
+
+// Export NDVI raster clipped to ROI
+Export.image.toDrive({
+  image: ndvi.clip(roi),
+  description: 'NDVI_map_ROI',
+  region: roi,
+  scale: 10,
+  maxPixels: 1e9
+});</code></pre>
+        <p class="note">
+          <strong>Important:</strong> If you drew the shape, rename <code>geometry → roi</code> in the Imports panel so the script runs.
+          You start exports from the <strong>Tasks/Exports</strong> tab (right sidebar) after running the code.
+        </p>
+      </div>
+    </section>
+
+    <!-- RUBRIC -->
+    <section class="card" aria-labelledby="rubric">
+      <div class="bar"><div><span id="rubric" class="subtitle">Grading rubric (quick and objective)</span></div></div>
+      <div class="section">
+        <ol>
+          <li><strong>Polygon created &amp; stats printed</strong> (20) — ROI exists, map centered, area + perimeter printed with units.</li>
+          <li><strong>S2 filtered &amp; visualized</strong> (20) — Date, bounds, and cloud filters applied; RGB layer added; clouds reasonably reduced.</li>
+          <li><strong>NDVI computed &amp; clipped by ROI</strong> (20) — NDVI layer present; clipping works (no colors outside ROI); sensible palette/range.</li>
+          <li><strong>Zonal stats + histogram</strong> (20) — Stats include mean/stdDev/min/max/percentiles; histogram chart visible.</li>
+          <li><strong>Sampling + exports</strong> (20) — Random points layer appears; sample table prints first rows; exports configured (Tasks panel shows jobs).</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- TIPS -->
+    <section class="card" aria-labelledby="tips">
+      <div class="bar"><div><span id="tips" class="subtitle">Tips &amp; common pitfalls</span></div></div>
+      <div class="section">
+        <ul>
+          <li><strong>Rename geometry:</strong> If you drew the shape, rename <code>geometry → roi</code> so the script finds it.</li>
+          <li><strong>Scale:</strong> For Sentinel‑2 use <code>scale: 10</code> (not the default 1000) in reductions/exports.</li>
+          <li><strong>Exports panel:</strong> After running the script, start jobs in <strong>Tasks/Exports</strong> by clicking <strong>Run</strong>.</li>
+          <li><strong>Too cloudy?</strong> Relax dates or increase <code>CLOUDY_PIXEL_PERCENTAGE</code> slightly (keep the QA60 mask).</li>
+          <li><strong>Geostatistics workflows:</strong> Use the CSV in R/QGIS for histograms, Q–Q plots, spatial autocorrelation, variograms.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- REFERENCES -->
+    <section class="card" aria-labelledby="refs">
+      <div class="bar"><div><span id="refs" class="subtitle">References</span></div></div>
+      <div class="footnotes">
+        <ol>
+          <li id="ref1"><a href="https://code.earthengine.google.com/?utm_source=chatgpt.com" target="_blank" rel="noopener">Earth Engine Code Editor</a></li>
+          <li><a href="https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR?utm_source=chatgpt.com" target="_blank" rel="noopener">Sentinel‑2 L2A (COPERNICUS/S2_SR)</a></li>
+          <li><a href="https://developers.google.com/earth-engine/apidocs/ee-image-normalizeddifference?utm_source=chatgpt.com" target="_blank" rel="noopener">NDVI via <code>normalizedDifference</code></a></li>
+          <li><a href="https://developers.google.com/earth-engine/ui_charts#image-histogram?utm_source=chatgpt.com" target="_blank" rel="noopener">Histogram charts</a></li>
+          <li><a href="https://developers.google.com/earth-engine/guides/exporting?utm_source=chatgpt.com" target="_blank" rel="noopener">Exporting tables & images</a></li>
+        </ol>
+      </div>
+    </section>
+
+    <p class="hint" style="margin-top:.75rem">
+      This page is English‑only, classroom‑ready, and print‑friendly. Update dates/thresholds to fit your semester.
+    </p>
+  </div>
+</body>
+</html>
