@@ -3,25 +3,23 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Google Earth Engine Quickstart (EN/HU) — University of Szeged</title>
+<title>Google Earth Engine — Quick Access & First Run (EN) — University of Szeged</title>
 <style>
   :root{
     --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
-    --accent:#2563eb; --accent-2:#38bdf8; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
-    --code:#0b1220; --code-bg:#0f172a; --code-ink:#e6ebf5;
+    --accent:#2563eb; --accent-2:#22d3ee; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --code-bg:#0b1220; --code-ink:#e6ebf5; --badge:#eef2ff;
   }
   @media (prefers-color-scheme: dark){
     :root{
       --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
       --accent:#60a5fa; --accent-2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
-      --code:#e6ebf5; --code-bg:#0b1220; --code-ink:#e6ebf5;
+      --code-bg:#0a0f1c; --code-ink:#e6ebf5; --badge:#1e293b;
     }
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; padding:2rem; background:var(--bg); color:var(--ink);
-    font:16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
-  }
+  body{margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+       font:16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";}
   .wrap{max-width:1100px; margin-inline:auto}
 
   /* HEADER */
@@ -29,9 +27,11 @@
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
   }
-  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;}
-  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;}
-  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:.25rem .5rem; border-radius:999px}
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase;
+         background: rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+         padding:.25rem .5rem; border-radius:999px}
   h1{margin:0; font-size:1.35rem; font-weight:700}
   h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
   .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
@@ -40,22 +40,25 @@
   .logo-chip.logo-dept img{height:55px}
   .logo-chip.logo-szte img{height:42px}
 
-  /* HERO (no external image; soft gradient banner) */
+  /* HERO (banner without external image) */
   .hero{
-    margin-top:1rem; border-radius:16px; overflow:hidden; box-shadow:var(--shadow); border:1px solid var(--border);
-    background: radial-gradient(1200px 400px at 10% 0%, rgba(56,189,248,.20), transparent 60%),
-                radial-gradient(1200px 400px at 90% 0%, rgba(37,99,235,.22), transparent 60%),
-                linear-gradient(180deg, rgba(2,6,23,.05), rgba(2,6,23,.0));
-    padding:1.2rem 1rem;
+    margin-top:1rem; border-radius:16px; overflow:hidden; box-shadow:var(--shadow);
+    border:1px solid var(--border); background:
+      radial-gradient(80% 120% at 0% 100%, rgba(34,211,238,.18), transparent 55%),
+      radial-gradient(80% 120% at 100% 0%, rgba(37,99,235,.18), transparent 55%),
+      linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #1e293b 100%);
+    color:#fff; position:relative;
   }
-  .hero-inner{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
-  .hero-text{color:var(--ink)}
-  .hero-title{margin:.2rem 0; font-weight:800; font-size:1.2rem}
-  .hero-sub{margin:0; color:var(--muted)}
-  .hero-badges{display:flex; gap:.5rem; flex-wrap:wrap}
-  .chip{background:rgba(56,189,248,.12); border:1px solid rgba(56,189,248,.4); color:#075985; padding:.25rem .5rem; border-radius:999px; font-weight:700; font-size:.8rem}
+  .hero-inner{padding:2.25rem 1.25rem}
+  .hero h3{margin:.2rem 0 0; font-size:1.15rem; font-weight:600; opacity:.95}
+  .hero .pill{
+    display:inline-flex; gap:.5rem; align-items:center;
+    background: rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32);
+    border-radius:999px; padding:.35rem .6rem; font-weight:600; letter-spacing:.02em;
+  }
+  .hero .blurb{margin-top:.6rem; opacity:.95}
 
-  /* CARDS */
+  /* CARDS & CONTENT */
   .card{background:var(--card); border:1px solid var(--border); border-radius:16px; margin-top:1rem; box-shadow:var(--shadow); overflow:hidden}
   .bar{padding:.9rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
   .subtitle{font-weight:600}
@@ -63,57 +66,49 @@
   .btn:hover{border-color:var(--accent); color:var(--accent)}
   .hint{color:var(--muted); font-size:.92rem}
 
-  /* Bilingual table */
-  table.twocol{width:100%; border-collapse:separate; border-spacing:0}
-  thead th{
-    background: linear-gradient(180deg, rgba(37,99,235,.08), rgba(56,189,248,.08));
-    padding:.85rem 1rem; text-align:left; font-weight:700; border-bottom:1px solid var(--border);
+  .section{padding:1rem}
+  h3{margin:0 0 .35rem; font-size:1.05rem}
+  ol{margin:.25rem 0 .75rem 1.2rem}
+  ul{margin:.2rem 0 .6rem 1.2rem}
+  .callout{
+    background:rgba(2,6,23,.04); border:1px solid var(--border); border-radius:12px;
+    padding:.75rem .9rem; margin:.6rem 0; color:var(--ink)
   }
-  tbody td{padding:.85rem 1rem; vertical-align:top; border-bottom:1px solid var(--border)}
-  tbody tr:nth-child(odd) td{background: rgba(148,163,184,.06)}
-  .lang-label{display:inline-block; font-size:.75rem; font-weight:700; letter-spacing:.04em; padding:.2rem .5rem; border-radius:6px; background:rgba(56,189,248,.15); color:#0369a1; margin-left:.5rem}
-  .sym, code, kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
-  ul{margin:.4rem 0 .2rem 1.25rem}
-  ol{margin:.4rem 0 .2rem 1.25rem}
+  .note{color:var(--muted); font-size:.95rem}
+  a{color:var(--accent); text-decoration:none} a:hover{text-decoration:underline}
 
-  /* Code blocks with copy button */
-  .codeblock{position:relative; background:var(--code-bg); color:var(--code-ink); border-radius:12px; border:1px solid var(--border); margin:.5rem 0; overflow:auto}
-  .codeblock pre{margin:0; padding:1rem; font-size:.95rem; line-height:1.5}
-  .copybtn{
-    position:absolute; top:.5rem; right:.5rem; font-size:.8rem; border:1px solid rgba(255,255,255,.35);
-    background:rgba(255,255,255,.15); color:#fff; padding:.2rem .5rem; border-radius:8px; cursor:pointer
-  }
-  .copybtn:hover{background:rgba(255,255,255,.25)}
+  /* CODE */
+  pre{margin:.6rem 0; background:var(--code-bg); color:var(--code-ink); padding:1rem; border-radius:12px; overflow:auto; border:1px solid #0f274a}
+  code, kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+  .codebar{display:flex; justify-content:space-between; align-items:center; gap:.5rem; margin-top:.25rem}
+  .code-title{font-size:.92rem; color:var(--muted)}
+  .copy{border:1px solid rgba(255,255,255,.25); color:#fff; background:transparent; padding:.25rem .55rem; border-radius:8px; cursor:pointer}
+  .copy:hover{background:rgba(255,255,255,.08)}
 
-  /* Links list */
-  .links{padding:1rem}
-  .links a{color:var(--accent); text-decoration:none}
-  .links a:hover{text-decoration:underline}
+  /* FOOTNOTES */
+  .footnotes{padding:1rem; font-size:.95rem}
+  .footnotes li{margin:.25rem 0}
+  .kbd{background:var(--badge); border:1px solid var(--border); padding:.05rem .35rem; border-radius:6px; font-weight:700}
 
   @media (max-width:720px){
     body{padding:1rem}
-    thead th, tbody td{font-size:.96rem}
+    h1{font-size:1.2rem}
     .logo-chip img{height:38px}
     .logo-chip.logo-dept img{height:48px}
   }
 </style>
 <script>
   function printPage(){ window.print(); }
-  function hookCopy(){
-    document.querySelectorAll('.copybtn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const pre = btn.closest('.codeblock').querySelector('pre');
-        if(!pre) return;
-        const text = pre.innerText;
-        navigator.clipboard.writeText(text).then(()=>{
-          const old = btn.textContent;
-          btn.textContent = 'Copied!';
-          setTimeout(()=>btn.textContent = old, 1200);
-        });
-      });
+
+  function copyCode(id){
+    const el = document.getElementById(id);
+    if (!el) return;
+    const txt = el.innerText;
+    navigator.clipboard.writeText(txt).then(()=>{
+      const b = document.querySelector(`[data-copy="${id}"]`);
+      if (b){ const old=b.textContent; b.textContent='Copied'; setTimeout(()=>b.textContent=old, 1200); }
     });
   }
-  document.addEventListener('DOMContentLoaded', hookCopy);
 </script>
 </head>
 <body>
@@ -122,7 +117,7 @@
       <div class="header-top">
         <div class="title">
           <span class="badge">University of Szeged</span>
-          <h1>Department of Atmospheric and Geospatial Data Science</h1>
+          <h1>Google Earth Engine — Quick Access & First Run (English)</h1>
         </div>
         <div class="logo-row" aria-label="Department and University logos">
           <span class="logo-chip logo-dept" title="Department logo">
@@ -133,281 +128,183 @@
           </span>
         </div>
       </div>
-      <h2>Google Earth Engine Quickstart (EN/HU)</h2>
+      <h2>Department of Atmospheric and Geospatial Data Science</h2>
     </header>
 
-    <!-- HERO -->
-    <section class="hero" aria-label="Earth Engine banner">
+    <!-- Banner (hero) -->
+    <section class="hero" aria-label="Google Earth Engine banner">
       <div class="hero-inner">
-        <div class="hero-text">
-          <div class="hero-badges">
-            <span class="chip">Earth Engine</span>
-            <span class="chip">2025 note</span>
-            <span class="chip">JS &amp; Python</span>
-          </div>
-          <p class="hero-title">Set up access · Run your first script · Learn fast</p>
-          <p class="hero-sub">Noncommercial or commercial usage paths, Code Editor &amp; Python setup, and quick links to official docs.</p>
-        </div>
-        <div aria-hidden="true" style="flex:1 1 240px"></div>
+        <span class="pill">🌍 Google Earth Engine • Quickstart 2025</span>
+        <h3>From registration to your first map — in minutes</h3>
+        <p class="blurb">Follow the steps below to register, open the Code Editor, run a first Landsat script, and optionally set up Python.</p>
       </div>
     </section>
 
-    <!-- MAIN CONTENT -->
-    <section class="card" aria-labelledby="slide-title">
+    <!-- CONTENT -->
+    <section class="card" aria-labelledby="sec-1">
       <div class="bar">
-        <div>
-          <div id="slide-title" class="subtitle">Earth Engine — Step‑by‑step / Földmotor — Lépésről lépésre</div>
-          <div class="hint">Bilingual side‑by‑side. Print‑ready. Links go to official docs.</div>
-        </div>
+        <div><span id="sec-1" class="subtitle">1) What you need first</span></div>
         <div><button class="btn" onclick="printPage()">Print</button></div>
       </div>
-
-      <table class="twocol" role="table" aria-describedby="slide-title">
-        <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
-        <thead>
-          <tr>
-            <th>English <span class="lang-label">EN</span></th>
-            <th>Magyar <span class="lang-label">HU</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- 1) What you need first -->
-          <tr>
-            <td>
-              <h3 style="margin:.2rem 0">1) What you need first</h3>
-              <ol>
-                <li>A Google account (Gmail or institutional).</li>
-                <li>Decide your usage:
-                  <ul>
-                    <li><strong>Noncommercial (free)</strong> for research, learning, NGOs, etc.</li>
-                    <li><strong>Commercial (paid)</strong> if you’ll use it for business. <a href="https://earthengine.google.com/?utm_source=chatgpt.com">Google Earth Engine</a></li>
-                  </ul>
-                </li>
-              </ol>
-            </td>
-            <td>
-              <h3 style="margin:.2rem 0">1) Amire először szükség van</h3>
-              <ol>
-                <li>Google‑fiók (Gmail vagy intézményi).</li>
-                <li>Döntsd el a felhasználás módját:
-                  <ul>
-                    <li><strong>Nem kereskedelmi (ingyenes)</strong> kutatáshoz, tanuláshoz, civil szervezeteknek stb.</li>
-                    <li><strong>Kereskedelmi (fizetős)</strong> ha üzleti célra használod. <a href="https://earthengine.google.com/?utm_source=chatgpt.com">Google Earth Engine</a></li>
-                  </ul>
-                </li>
-              </ol>
-            </td>
-          </tr>
-
-          <!-- 2) Create access -->
-          <tr>
-            <td>
-              <h3 style="margin:.2rem 0">2) Create your Earth Engine access</h3>
-              <p><strong>Option A — Quickest (Code Editor path)</strong></p>
-              <ol>
-                <li>Go to the <a href="https://code.earthengine.google.com/register?utm_source=chatgpt.com">registration page</a> and sign in.</li>
-                <li>Click <em>“Register a Noncommercial or Commercial Cloud project.”</em></li>
-                <li>Choose <strong>Unpaid usage</strong> (noncommercial) or <strong>Paid usage</strong> (commercial), then follow the prompts to create or select a Google Cloud project and finish registration.</li>
-              </ol>
-              <blockquote class="hint" style="margin:.5rem 0 0">
-                <strong>Note (2025):</strong> Noncommercial projects must complete a verification questionnaire (and periodic reverifications). Projects registered before <strong>Apr 16, 2025</strong> need verification by <strong>Sept 26, 2025</strong> to avoid a pause. <a href="https://developers.google.com/earth-engine/guides/access?utm_source=chatgpt.com">Google for Developers</a>
-              </blockquote>
-              <p style="margin-top:.75rem"><strong>Option B — Through Google Cloud (good for org/commercial)</strong></p>
-              <ol>
-                <li>In the Google Cloud Console, open the Earth Engine <em>Product Registration</em> page.</li>
-                <li>Pick <strong>Noncommercial</strong> (unpaid) or <strong>Commercial</strong> (paid) and complete the form (questionnaire for noncommercial; choose a plan for commercial). <a href="https://developers.google.com/earth-engine/guides/access?utm_source=chatgpt.com">Docs</a></li>
-              </ol>
-            </td>
-            <td>
-              <h3 style="margin:.2rem 0">2) Earth Engine hozzáférés létrehozása</h3>
-              <p><strong>A opció — A leggyorsabb (Code Editor útvonal)</strong></p>
-              <ol>
-                <li>Nyisd meg a <a href="https://code.earthengine.google.com/register?utm_source=chatgpt.com">regisztrációs oldalt</a> és jelentkezz be.</li>
-                <li>Kattints: <em>„Register a Noncommercial or Commercial Cloud project.”</em></li>
-                <li>Válaszd a <strong>Unpaid usage</strong> (nem kereskedelmi) vagy a <strong>Paid usage</strong> (kereskedelmi) lehetőséget, majd kövesd a lépéseket Google Cloud projekt létrehozásához/kiválasztásához és a regisztráció befejezéséhez.</li>
-              </ol>
-              <blockquote class="hint" style="margin:.5rem 0 0">
-                <strong>Megjegyzés (2025):</strong> A nem kereskedelmi projekteknek ellenőrzési kérdőívet kell kitölteniük (és időszakos újraellenőrzéseket). A <strong>2025. ápr. 16.</strong> előtt regisztrált projekteknek <strong>2025. szept. 26‑ig</strong> kell igazolniuk, különben a hozzáférés szünetelhet. <a href="https://developers.google.com/earth-engine/guides/access?utm_source=chatgpt.com">Fejlesztői dokumentáció</a>
-              </blockquote>
-              <p style="margin-top:.75rem"><strong>B opció — Google Cloudon keresztül (szervezetek/üzleti cél esetén)</strong></p>
-              <ol>
-                <li>A Google Cloud Console‑ban nyisd meg az Earth Engine <em>Product Registration</em> (termékregisztráció) oldalt.</li>
-                <li>Válaszd a <strong>Noncommercial</strong> (ingyenes) vagy <strong>Commercial</strong> (fizetős) lehetőséget és töltsd ki az űrlapot (nem kereskedelmi esetén kérdőív; kereskedelmi esetén csomagválasztás). <a href="https://developers.google.com/earth-engine/guides/access?utm_source=chatgpt.com">Dokumentáció</a></li>
-              </ol>
-            </td>
-          </tr>
-
-          <!-- 3) Open Code Editor -->
-          <tr>
-            <td>
-              <h3 style="margin:.2rem 0">3) Open the Earth Engine Code Editor</h3>
-              <p>Visit the <a href="https://earthengine.google.com/platform/?utm_source=chatgpt.com">Code Editor</a> to confirm access and run scripts in your browser. It’s a web IDE with instant access to the data catalog.</p>
-            </td>
-            <td>
-              <h3 style="margin:.2rem 0">3) Nyisd meg a Code Editor‑t</h3>
-              <p>Látogasd meg a <a href="https://earthengine.google.com/platform/?utm_source=chatgpt.com">Code Editor</a> felületet a hozzáférés ellenőrzésére és a böngészős futtatáshoz. Webes IDE az adat‑katalógus azonnali elérésével.</p>
-            </td>
-          </tr>
-
-          <!-- 4) First run -->
-          <tr>
-            <td>
-              <h3 style="margin:.2rem 0">4) Your very first run (in the Code Editor)</h3>
-              <ol>
-                <li>In the left <strong>Scripts</strong> pane, click <strong>New</strong> → <strong>Script</strong>.</li>
-                <li>Paste this JavaScript and click <strong>Run</strong>:</li>
-              </ol>
-              <div class="codeblock">
-                <button class="copybtn" aria-label="Copy code">Copy</button>
-                <pre><code>// Load a Landsat 8 image over Budapest and display true color
-var img = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2')
-  .filterBounds(ee.Geometry.Point(19.0402, 47.4979))
-  .filterDate('2023-06-01', '2023-08-31')
-  .sort('CLOUD_COVER')
-  .first()
-  .resample('bicubic');
-
-var rgb = img.select(['SR_B4','SR_B3','SR_B2']).multiply(0.0000275).add(-0.2);
-Map.centerObject(rgb, 10);
-Map.addLayer(rgb, {min:0.03, max:0.3}, 'L8 True Color');</code></pre>
-              </div>
-              <p class="hint" style="margin:.3rem 0 0">Any beginner quickstart/tutorial in the docs will also work the same way. <a href="https://developers.google.com/earth-engine/guides/getstarted?utm_source=chatgpt.com">Get Started</a></p>
-            </td>
-            <td>
-              <h3 style="margin:.2rem 0">4) Az első futtatás (a Code Editor‑ban)</h3>
-              <ol>
-                <li>A bal oldali <strong>Scripts</strong> panelen: <strong>New</strong> → <strong>Script</strong>.</li>
-                <li>Illeszd be ezt a JavaScript kódot és kattints a <strong>Run</strong> gombra:</li>
-              </ol>
-              <div class="codeblock">
-                <button class="copybtn" aria-label="Copy code">Másolás</button>
-                <pre><code>// Landsat 8, Budapest, valódi színes megjelenítés
-var img = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2')
-  .filterBounds(ee.Geometry.Point(19.0402, 47.4979))
-  .filterDate('2023-06-01', '2023-08-31')
-  .sort('CLOUD_COVER')
-  .first()
-  .resample('bicubic');
-
-var rgb = img.select(['SR_B4','SR_B3','SR_B2']).multiply(0.0000275).add(-0.2);
-Map.centerObject(rgb, 10);
-Map.addLayer(rgb, {min:0.03, max:0.3}, 'L8 True Color');</code></pre>
-              </div>
-              <p class="hint" style="margin:.3rem 0 0">Bármely kezdő „Quickstart”/„Get Started” útmutató ugyanígy működik. <a href="https://developers.google.com/earth-engine/guides/getstarted?utm_source=chatgpt.com">Kezdő lépések</a></p>
-            </td>
-          </tr>
-
-          <!-- 5) Python -->
-          <tr>
-            <td>
-              <h3 style="margin:.2rem 0">5) (Optional) Set up Python</h3>
-              <p>Install the API:</p>
-              <div class="codeblock">
-                <button class="copybtn" aria-label="Copy code">Copy</button>
-                <pre><code>pip install earthengine-api</code></pre>
-              </div>
-              <p>Authenticate &amp; initialize:</p>
-              <div class="codeblock">
-                <button class="copybtn" aria-label="Copy code">Copy</button>
-                <pre><code>import ee
-ee.Authenticate()     # follow the browser link, pick your Google Cloud project
-ee.Initialize()       # choose/confirm the same project
-
-# Quick test: print image info
-img = ee.Image('CGIAR/SRTM90_V4')
-print(img.getInfo()['id'])</code></pre>
-              </div>
-              <p class="hint">Notebook auth now asks you to select a Google Cloud project during the flow. <a href="https://developers.google.com/earth-engine/guides/auth?utm_source=chatgpt.com">Auth docs</a></p>
-            </td>
-            <td>
-              <h3 style="margin:.2rem 0">5) (Opcionális) Python beállítása</h3>
-              <p>API telepítése:</p>
-              <div class="codeblock">
-                <button class="copybtn" aria-label="Copy code">Másolás</button>
-                <pre><code>pip install earthengine-api</code></pre>
-              </div>
-              <p>Hitelesítés és inicializálás:</p>
-              <div class="codeblock">
-                <button class="copybtn" aria-label="Copy code">Másolás</button>
-                <pre><code>import ee
-ee.Authenticate()     # böngészőben engedélyezd, válaszd a Google Cloud projektet
-ee.Initialize()       # ugyanazt a projektet erősítsd meg
-
-# Gyors próba: kép-információk kiírása
-img = ee.Image('CGIAR/SRTM90_V4')
-print(img.getInfo()['id'])</code></pre>
-              </div>
-              <p class="hint">Notebook hitelesítéskor most <em>Google Cloud projektet</em> kell választani. <a href="https://developers.google.com/earth-engine/guides/auth?utm_source=chatgpt.com">Hitelesítés</a></p>
-            </td>
-          </tr>
-
-          <!-- 6) Learn fast -->
-          <tr>
-            <td>
-              <h3 style="margin:.2rem 0">6) Learn the basics fast (recommended)</h3>
-              <ul>
-                <li><a href="https://developers.google.com/earth-engine/guides/quickstart_javascript?utm_source=chatgpt.com">Get Started / Quickstart (Code Editor)</a></li>
-                <li><a href="https://developers.google.com/earth-engine/tutorials/community/beginners-cookbook?utm_source=chatgpt.com">Beginner’s Cookbook</a></li>
-                <li><a href="https://courses.spatialthoughts.com/end-to-end-gee.html?utm_source=chatgpt.com">End‑to‑End GEE (free course)</a></li>
-              </ul>
-            </td>
-            <td>
-              <h3 style="margin:.2rem 0">6) Tanuld meg gyorsan az alapokat (ajánlott)</h3>
-              <ul>
-                <li><a href="https://developers.google.com/earth-engine/guides/quickstart_javascript?utm_source=chatgpt.com">Gyors kezdés (Code Editor)</a></li>
-                <li><a href="https://developers.google.com/earth-engine/tutorials/community/beginners-cookbook?utm_source=chatgpt.com">Beginner’s Cookbook</a></li>
-                <li><a href="https://courses.spatialthoughts.com/end-to-end-gee.html?utm_source=chatgpt.com">End‑to‑End GEE (ingyenes kurzus)</a></li>
-              </ul>
-            </td>
-          </tr>
-
-          <!-- Gotchas -->
-          <tr>
-            <td>
-              <h3 style="margin:.2rem 0">Common gotchas (and fixes)</h3>
-              <ul>
-                <li><strong>“I registered but still can’t access”</strong> → Make sure your registration finished and is tied to the correct <em>Google Cloud project</em>, and complete the <em>noncommercial questionnaire</em> if applicable. Then re‑open the Code Editor. <a href="https://developers.google.com/earth-engine/guides/access?utm_source=chatgpt.com">Access guide</a></li>
-                <li><strong>Government/agency users</strong> → may need an institutional Google account and extra review for noncommercial access. <a href="https://earthengine.google.com/noncommercial/?utm_source=chatgpt.com">Noncommercial</a></li>
-              </ul>
-            </td>
-            <td>
-              <h3 style="margin:.2rem 0">Gyakori buktatók (és megoldásuk)</h3>
-              <ul>
-                <li><strong>„Regisztráltam, de mégsem férek hozzá”</strong> → Ellenőrizd, hogy a regisztráció befejeződött‑e, a megfelelő <em>Google Cloud projekthez</em> kötött‑e, és (ha kell) kitöltötted‑e a <em>nem kereskedelmi kérdőívet</em>. Ezután nyisd meg újra a Code Editort. <a href="https://developers.google.com/earth-engine/guides/access?utm_source=chatgpt.com">Hozzáférés</a></li>
-                <li><strong>Hatósági/szervezeti felhasználók</strong> → gyakran intézményi Google‑fiók és extra felülvizsgálat szükséges a nem kereskedelmi hozzáféréshez. <a href="https://earthengine.google.com/noncommercial/?utm_source=chatgpt.com">Nem kereskedelmi</a></li>
-              </ul>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- LINKS -->
-    <section class="card" aria-labelledby="links-title">
-      <div class="bar">
-        <div>
-          <div id="links-title" class="subtitle">References &amp; Links / Hivatkozások</div>
-          <div class="hint">Official Earth Engine pages and courses.</div>
-        </div>
-      </div>
-      <div class="links">
+      <div class="section">
         <ol>
-          <li><a href="https://earthengine.google.com/?utm_source=chatgpt.com">Google Earth Engine</a></li>
-          <li><a href="https://code.earthengine.google.com/register?utm_source=chatgpt.com">Code Editor — Registration</a></li>
-          <li><a href="https://developers.google.com/earth-engine/guides/access?utm_source=chatgpt.com">Earth Engine access (Developers)</a></li>
-          <li><a href="https://earthengine.google.com/platform/?utm_source=chatgpt.com">Platform / Code Editor</a></li>
-          <li><a href="https://developers.google.com/earth-engine/guides/getstarted?utm_source=chatgpt.com">Get Started</a></li>
-          <li><a href="https://developers.google.com/earth-engine/guides/auth?utm_source=chatgpt.com">Authentication &amp; Initialization</a></li>
-          <li><a href="https://developers.google.com/earth-engine/guides/quickstart_javascript?utm_source=chatgpt.com">Quickstart — JavaScript</a></li>
-          <li><a href="https://developers.google.com/earth-engine/tutorials/community/beginners-cookbook?utm_source=chatgpt.com">Beginner’s Cookbook</a></li>
-          <li><a href="https://courses.spatialthoughts.com/end-to-end-gee.html?utm_source=chatgpt.com">End‑to‑End GEE (course)</a></li>
-          <li><a href="https://earthengine.google.com/noncommercial/?utm_source=chatgpt.com">Noncommercial info</a></li>
+          <li>A Google account (Gmail or institutional).</li>
+          <li>Decide your usage:
+            <ul>
+              <li><strong>Noncommercial (free)</strong> for research, learning, NGOs, etc.</li>
+              <li><strong>Commercial (paid)</strong> if you’ll use it for business. <a href="#ref1">[Google Earth Engine]</a></li>
+            </ul>
+          </li>
         </ol>
       </div>
     </section>
 
-    <p class="hint" style="margin-top:.75rem;">
-      Snapshot for teaching/quickstart. Always refer to the official docs for current requirements and dates.
+    <section class="card" aria-labelledby="sec-2">
+      <div class="bar">
+        <div><span id="sec-2" class="subtitle">2) Create your Earth Engine access</span></div>
+      </div>
+      <div class="section">
+        <h3>Option A — Quickest (Code Editor path)</h3>
+        <ol>
+          <li>Go to the registration page and sign in.</li>
+          <li>Click <span class="kbd">Register a Noncommercial or Commercial Cloud project</span>.</li>
+          <li>Choose <strong>Unpaid usage</strong> (noncommercial) or <strong>Paid usage</strong> (commercial), then follow the prompts to create or select a Google Cloud project and finish registration. <a href="#ref2">[code.earthengine.google.com]</a></li>
+        </ol>
+        <div class="callout">
+          <strong>Note (2025):</strong> Noncommercial projects must complete a verification questionnaire (and periodic reverifications).
+          Projects registered before <strong>Apr 16, 2025</strong> need verification by <strong>Sept 26, 2025</strong> to avoid a pause. <a href="#ref3">[Google for Developers]</a>
+        </div>
+
+        <h3>Option B — Through Google Cloud (especially for org/commercial)</h3>
+        <ol>
+          <li>In the Google Cloud Console, open the Earth Engine <strong>Product Registration</strong> page.</li>
+          <li>Pick <strong>Noncommercial</strong> (unpaid) or <strong>Commercial</strong> (paid) and complete the form (questionnaire for noncommercial; choose a plan for commercial). <a href="#ref3">[Google for Developers]</a></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="sec-3">
+      <div class="bar">
+        <div><span id="sec-3" class="subtitle">3) Open the Earth Engine Code Editor</span></div>
+      </div>
+      <div class="section">
+        <p>Visit the <strong>Code Editor</strong> to confirm access and run scripts in your browser. It’s a web IDE with instant access to the data catalog. <a href="#ref4">[Google Earth Engine]</a></p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="sec-4">
+      <div class="bar">
+        <div><span id="sec-4" class="subtitle">4) Your very first run (in the Code Editor)</span></div>
+      </div>
+      <div class="section">
+        <ol>
+          <li>In the left <strong>Scripts</strong> pane, click <span class="kbd">New</span> → <span class="kbd">Script</span>.</li>
+          <li>Paste this JavaScript and click <span class="kbd">Run</span>:</li>
+        </ol>
+
+        <div class="codebar">
+          <span class="code-title">JavaScript — Landsat 8 over Budapest (true color)</span>
+          <button class="copy" data-copy="js1" onclick="copyCode('js1')">Copy</button>
+        </div>
+        <pre id="js1"><code>// Load a Landsat 8 image over Budapest and display true color
+var img = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2')
+  .filterBounds(ee.Geometry.Point(19.0402, 47.4979))
+  .filterDate('2023-06-01', '2023-08-31')
+  .sort('CLOUD_COVER')
+  .first()
+  .resample('bicubic');
+
+var rgb = img.select(['SR_B4','SR_B3','SR_B2']).multiply(0.0000275).add(-0.2);
+Map.centerObject(rgb, 10);
+Map.addLayer(rgb, {min:0.03, max:0.3}, 'L8 True Color');</code></pre>
+
+        <p class="note">(Any beginner quickstart/tutorial in the docs will also work the same way.) <a href="#ref5">[Google for Developers]</a></p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="sec-5">
+      <div class="bar">
+        <div><span id="sec-5" class="subtitle">5) (Optional) Set up Python</span></div>
+      </div>
+      <div class="section">
+        <ol>
+          <li>Install the API:</li>
+        </ol>
+
+        <div class="codebar">
+          <span class="code-title">pip</span>
+          <button class="copy" data-copy="pyi" onclick="copyCode('pyi')">Copy</button>
+        </div>
+        <pre id="pyi"><code>pip install earthengine-api</code></pre>
+
+        <ol start="2">
+          <li>Authenticate & initialize in a notebook or local Python:</li>
+        </ol>
+
+        <div class="codebar">
+          <span class="code-title">Python</span>
+          <button class="copy" data-copy="py1" onclick="copyCode('py1')">Copy</button>
+        </div>
+        <pre id="py1"><code>import ee
+ee.Authenticate()     # follow the browser link, pick your Google Cloud project
+ee.Initialize()       # choose/confirm the same project
+# Quick test: print image info
+img = ee.Image('CGIAR/SRTM90_V4')
+print(img.getInfo()['id'])</code></pre>
+
+        <p class="note">Notebook authentication now asks you to <strong>select a Google Cloud project</strong> during the auth flow. <a href="#ref6">[Google for Developers]</a></p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="sec-6">
+      <div class="bar">
+        <div><span id="sec-6" class="subtitle">6) Learn the basics fast (recommended)</span></div>
+      </div>
+      <div class="section">
+        <ul>
+          <li><strong>Get Started / Quickstart</strong> (JavaScript Code Editor). <a href="#ref7">[Google for Developers]</a></li>
+          <li><strong>Beginner’s Cookbook</strong> (hands-on intro). <a href="#ref8">[Google for Developers]</a></li>
+          <li><strong>End-to-End GEE (free course)</strong> if you want structured practice. <a href="#ref9">[Spatial Thoughts]</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="sec-7">
+      <div class="bar">
+        <div><span id="sec-7" class="subtitle">Common gotchas (and fixes)</span></div>
+      </div>
+      <div class="section">
+        <ul>
+          <li><strong>“I registered but still can’t access”</strong> → Make sure your registration finished and is tied to the correct <strong>Google Cloud project</strong>, and complete the <strong>noncommercial questionnaire</strong> if applicable. Then re-open the Code Editor. <a href="#ref3">[Google for Developers]</a></li>
+          <li><strong>Government/agency users</strong> → may need an institutional Google account and extra review for noncommercial access. <a href="#ref10">[Google Earth Engine]</a></li>
+        </ul>
+        <p class="note">If you tell me whether you’re noncommercial or commercial, I can tailor the exact clicks for your case (and give you a one‑page checklist).</p>
+      </div>
+    </section>
+
+    <!-- FOOTNOTES -->
+    <section class="card" aria-labelledby="refs">
+      <div class="bar">
+        <div><span id="refs" class="subtitle">References</span></div>
+      </div>
+      <div class="footnotes">
+        <ol>
+          <li id="ref1"><a href="https://earthengine.google.com/?utm_source=chatgpt.com" target="_blank" rel="noopener">Google Earth Engine</a></li>
+          <li id="ref2"><a href="https://code.earthengine.google.com/register?utm_source=chatgpt.com" target="_blank" rel="noopener">Register (Code Editor)</a></li>
+          <li id="ref3"><a href="https://developers.google.com/earth-engine/guides/access?utm_source=chatgpt.com" target="_blank" rel="noopener">Earth Engine access — Google for Developers</a></li>
+          <li id="ref4"><a href="https://earthengine.google.com/platform/?utm_source=chatgpt.com" target="_blank" rel="noopener">Platform overview</a></li>
+          <li id="ref5"><a href="https://developers.google.com/earth-engine/guides/getstarted?utm_source=chatgpt.com" target="_blank" rel="noopener">Get Started with Earth Engine</a></li>
+          <li id="ref6"><a href="https://developers.google.com/earth-engine/guides/auth?utm_source=chatgpt.com" target="_blank" rel="noopener">Authentication & Initialization</a></li>
+          <li id="ref7"><a href="https://developers.google.com/earth-engine/guides/quickstart_javascript?utm_source=chatgpt.com" target="_blank" rel="noopener">Quickstart — JavaScript Code Editor</a></li>
+          <li id="ref8"><a href="https://developers.google.com/earth-engine/tutorials/community/beginners-cookbook?utm_source=chatgpt.com" target="_blank" rel="noopener">Beginner’s Cookbook</a></li>
+          <li id="ref9"><a href="https://courses.spatialthoughts.com/end-to-end-gee.html?utm_source=chatgpt.com" target="_blank" rel="noopener">End‑to‑End Google Earth Engine (Course)</a></li>
+          <li id="ref10"><a href="https://earthengine.google.com/noncommercial/?utm_source=chatgpt.com" target="_blank" rel="noopener">Noncommercial program details</a></li>
+        </ol>
+      </div>
+    </section>
+
+    <p class="hint" style="margin-top:.75rem">
+      This page is English‑only, classroom‑ready, and print‑friendly. Update deadlines as Google policies evolve.
     </p>
   </div>
 </body>
