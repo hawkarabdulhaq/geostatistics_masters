@@ -224,40 +224,6 @@ Map.addLayer(rgb, {min:0.03, max:0.3}, 'L8 True Color');</code></pre>
 
     <section class="card" aria-labelledby="sec-5">
       <div class="bar">
-        <div><span id="sec-5" class="subtitle">5) (Optional) Set up Python</span></div>
-      </div>
-      <div class="section">
-        <ol>
-          <li>Install the API:</li>
-        </ol>
-
-        <div class="codebar">
-          <span class="code-title">pip</span>
-          <button class="copy" data-copy="pyi" onclick="copyCode('pyi')">Copy</button>
-        </div>
-        <pre id="pyi"><code>pip install earthengine-api</code></pre>
-
-        <ol start="2">
-          <li>Authenticate & initialize in a notebook or local Python:</li>
-        </ol>
-
-        <div class="codebar">
-          <span class="code-title">Python</span>
-          <button class="copy" data-copy="py1" onclick="copyCode('py1')">Copy</button>
-        </div>
-        <pre id="py1"><code>import ee
-ee.Authenticate()     # follow the browser link, pick your Google Cloud project
-ee.Initialize()       # choose/confirm the same project
-# Quick test: print image info
-img = ee.Image('CGIAR/SRTM90_V4')
-print(img.getInfo()['id'])</code></pre>
-
-        <p class="note">Notebook authentication now asks you to <strong>select a Google Cloud project</strong> during the auth flow. <a href="#ref6">[Google for Developers]</a></p>
-      </div>
-    </section>
-
-    <section class="card" aria-labelledby="sec-6">
-      <div class="bar">
         <div><span id="sec-6" class="subtitle">6) Learn the basics fast (recommended)</span></div>
       </div>
       <div class="section">
@@ -269,7 +235,7 @@ print(img.getInfo()['id'])</code></pre>
       </div>
     </section>
 
-    <section class="card" aria-labelledby="sec-7">
+    <section class="card" aria-labelledby="sec-6">
       <div class="bar">
         <div><span id="sec-7" class="subtitle">Common gotchas (and fixes)</span></div>
       </div>
