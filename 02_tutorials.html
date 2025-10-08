@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Download an NDVI Map (Sentinel‑2, 10 m) — EN / HU — University of Szeged</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --accent:#2563eb; --accent-2:#38bdf8; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --shade:rgba(15,23,42,.06); --good:#16a34a; --warn:#f59e0b; --info:#0ea5e9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
+      --accent:#60a5fa; --accent-2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
+      --shade:rgba(255,255,255,.06); --good:#22c55e; --warn:#fbbf24; --info:#38bdf8;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  }
+  .wrap{max-width:1100px; margin-inline:auto}
+
+  /* HEADER */
+  header{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:.25rem .5rem; border-radius:999px}
+  h1{margin:0; font-size:1.35rem; font-weight:700}
+  h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
+  .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .logo-chip{display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.35rem .5rem; box-shadow:var(--shadow)}
+  .logo-chip img{display:block; height:42px; width:auto; object-fit:contain}
+  .logo-chip.logo-dept img{height:55px}
+  .logo-chip.logo-szte img{height:42px}
+
+  /* CARDS */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; margin-top:1rem; box-shadow:var(--shadow); overflow:hidden}
+  .bar{padding:.9rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .subtitle{font-weight:600}
+  .hint{color:var(--muted); font-size:.92rem}
+  .btn{border:1px solid var(--border); background:transparent; color:var(--ink); padding:.45rem .7rem; border-radius:10px; cursor:pointer; font-weight:600}
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .call{border-left:4px solid var(--info); background:rgba(14,165,233,.08); padding:.7rem .9rem; border-radius:10px}
+  .ok{color:var(--good); font-weight:700}
+  .warn{color:var(--warn)}
+
+  /* BILINGUAL TABLE */
+  table.twocol{width:100%; border-collapse:separate; border-spacing:0}
+  thead th{background:linear-gradient(180deg, rgba(37,99,235,.08), rgba(56,189,248,.08)); padding:.85rem 1rem; text-align:left; font-weight:700; border-bottom:1px solid var(--border)}
+  tbody td{padding:.85rem 1rem; vertical-align:top; border-bottom:1px solid var(--border)}
+  tbody tr:nth-child(odd) td{background:var(--shade)}
+  .lang-label{display:inline-block; font-size:.75rem; font-weight:700; letter-spacing:.04em; padding:.2rem .5rem; border-radius:6px; background:rgba(56,189,248,.15); color:#0369a1; margin-left:.5rem}
+  .sym, code, kbd, pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+
+  /* CODE BLOCK */
+  .codewrap{position:relative}
+  pre{
+    margin:0; padding:1rem; overflow:auto; background:#0b1020; color:#e6ebf5;
+    line-height:1.4; font-size:.95rem;
+  }
+  .copybar{
+    display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+    padding:.6rem .75rem; border-bottom:1px solid var(--border); background:var(--card);
+  }
+  .copybtn{border:1px solid var(--border); border-radius:8px; background:transparent; cursor:pointer; font-weight:700; padding:.35rem .6rem}
+  .copybtn:hover{border-color:var(--accent); color:var(--accent)}
+  .small{font-size:.95rem; color:var(--muted)}
+  ul,ol{margin:0; padding-left:1.2rem}
+</style>
+<script>
+  function printPage(){ window.print(); }
+  async function copyNDVI(){
+    const el = document.getElementById('geeCode');
+    const text = el.innerText;
+    try{
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('copyBtn');
+      const old = btn.textContent;
+      btn.textContent = 'Copied ✔';
+      setTimeout(()=>btn.textContent=old,1200);
+    }catch(e){
+      // Fallback
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+      document.execCommand('copy');
+      sel.removeAllRanges();
+      alert('Code copied to clipboard.');
+    }
+  }
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HEADER -->
+    <header>
+      <div class="header-top">
+        <div class="title">
+          <span class="badge">University of Szeged</span>
+          <h1>Download an NDVI Map for Your Area (Sentinel‑2, 10 m)</h1>
+        </div>
+        <div class="logo-row" aria-label="Department and University logos">
+          <span class="logo-chip logo-dept" title="Department logo">
+            <img src="https://geosci.u-szeged.hu/site/upload/2024/10/logo_v2_2_64x55.png" alt="Department of Atmospheric and Geospatial Data Science logo" />
+          </span>
+          <span class="logo-chip logo-szte" title="SZTE logo">
+            <img src="https://u-szeged.hu/site/design3/img/szte_logo_en.jpg" alt="University of Szeged logo (English)" />
+          </span>
+        </div>
+      </div>
+      <h2>Department of Atmospheric and Geospatial Data Science — EN / HU</h2>
+    </header>
+
+    <!-- WHAT THIS DOES -->
+    <section class="card" aria-labelledby="intro">
+      <div class="bar">
+        <div>
+          <span id="intro" class="subtitle">Goal / Cél</span>
+          <div class="hint">One‑click NDVI export from Google Earth Engine (S2 SR harmonized, May–Sep 2024, 10 m).</div>
+        </div>
+        <div><button class="btn" onclick="printPage()">Print</button></div>
+      </div>
+      <table class="twocol" role="table" aria-describedby="intro">
+        <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
+        <thead><tr><th>English <span class="lang-label">EN</span></th><th>Magyar <span class="lang-label">HU</span></th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              This ready script masks clouds/cirrus, builds a median Sentinel‑2 composite, computes NDVI, shows it on the map, and exports a GeoTIFF to Google Drive.
+            </td>
+            <td>
+              A kész szkript felhő/cirrus maszkolást végez, medián Sentinel‑2 kompozitot készít, kiszámítja az NDVI‑t, térképre rajzolja, majd GeoTIFF‑et exportál a Google Drive‑ra.
+            </td>
+          </tr>
+          <tr>
+            <td class="call"><strong>Prerequisites:</strong> Earth Engine access and a ROI (“geometry”) drawn in the Code Editor.</td>
+            <td class="call"><strong>Előfeltételek:</strong> Earth Engine hozzáférés és egy ROI („geometry”) megrajzolása a Code Editorban.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- STEP-BY-STEP -->
+    <section class="card" aria-labelledby="steps">
+      <div class="bar">
+        <div>
+          <span id="steps" class="subtitle">Steps / Lépések</span>
+          <div class="hint">Follow in the Google Earth Engine Code Editor.</div>
+        </div>
+      </div>
+      <table class="twocol" role="table" aria-describedby="steps">
+        <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
+        <thead><tr><th>EN</th><th>HU</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              1) Open the Code Editor and <strong>draw your ROI</strong> (polygon) — it creates a variable named <span class="sym">geometry</span>.<br/>
+              2) Paste the script below into a new script tab.<br/>
+              3) Click <strong>Run</strong> to preview NDVI.<br/>
+              4) In the <em>Tasks</em> tab, click <strong>Run</strong> on the export to send a GeoTIFF to Google Drive.
+            </td>
+            <td>
+              1) Nyisd meg a Code Editort és <strong>rajzold meg a ROI‑t</strong> (poligon) — létrejön a <span class="sym">geometry</span> változó.<br/>
+              2) Illeszd be a lenti kódot egy új szkriptbe.<br/>
+              3) Kattints a <strong>Run</strong> gombra az NDVI előnézetéhez.<br/>
+              4) A <em>Tasks</em> fülön kattints a <strong>Run</strong> gombra az exportáláshoz (GeoTIFF a Google Drive‑ra).
+            </td>
+          </tr>
+          <tr>
+            <td class="small"><span class="ok">Tip:</span> Adjust the date range for other seasons. Change <span class="sym">palette</span> or <span class="sym">min/max</span> for different color ramps.</td>
+            <td class="small"><span class="ok">Tipp:</span> Állítsd a dátumtartományt más időszakokra. A <span class="sym">palette</span> és <span class="sym">min/max</span> értékekkel módosítható a színezés.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- CODE -->
+    <section class="card" aria-labelledby="code">
+      <div class="bar">
+        <div>
+          <span id="code" class="subtitle">Ready‑to‑run Earth Engine Script / Kész Earth Engine szkript</span>
+          <div class="hint">Sentinel‑2 SR harmonized, QA60 cloud &amp; cirrus mask, NDVI, Drive export.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small"><strong>Copy & paste</strong> into the Code Editor. Draw your ROI first so <span class="sym">geometry</span> exists.</span>
+          <button id="copyBtn" class="copybtn" onclick="copyNDVI()">Copy code</button>
+        </div>
+        <pre id="geeCode">
+// 1) ROI: draw or define coordinates
+var roi = geometry;
+
+// 2) Sentinel-2 SR (harmonized), mask clouds via QA60 bits
+function maskS2(img) {
+  var qa = img.select('QA60');
+  var cloud = qa.bitwiseAnd(1 << 10).eq(0);
+  var cirrus = qa.bitwiseAnd(1 << 11).eq(0);
+  return img.updateMask(cloud.and(cirrus)).divide(10000);
+}
+
+var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+  .filterBounds(roi)
+  .filterDate('2024-05-01','2024-09-30')
+  .map(maskS2);
+
+// 3) Median composite and NDVI
+var composite = s2.median();
+var ndvi = composite.normalizedDifference(['B8','B4']).rename('NDVI');
+
+// 4) Inspect and export to Google Drive (GeoTIFF, 10 m)
+Map.centerObject(roi, 10);
+Map.addLayer(ndvi, {min: -0.2, max: 0.9, palette: ['blue','white','green']}, 'NDVI');
+
+Export.image.toDrive({
+  image: ndvi,
+  description: 'NDVI_S2',
+  fileNamePrefix: 'ndvi_s2_2024_growing_season',
+  region: roi,
+  scale: 10,
+  maxPixels: 1e13,
+  crs: 'EPSG:4326'
+});
+        </pre>
+      </div>
+    </section>
+
+    <!-- CHECKLIST / TROUBLESHOOT -->
+    <section class="card" aria-labelledby="checks">
+      <div class="bar">
+        <div>
+          <span id="checks" class="subtitle">Checklist & Troubleshooting / Ellenőrzőlista & hibakeresés</span>
+          <div class="hint">Common issues and quick fixes.</div>
+        </div>
+      </div>
+      <table class="twocol" role="table" aria-describedby="checks">
+        <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
+        <thead><tr><th>EN</th><th>HU</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <ul>
+                <li class="warn"><strong>ReferenceError: geometry is not defined</strong> → Draw a ROI in the map (or replace <span class="sym">geometry</span> with your <span class="sym">ee.Geometry(...)</span>).</li>
+                <li><strong>No Tasks panel export?</strong> → Click <em>Run</em> first; the export appears under <em>Tasks</em>.</li>
+                <li><strong>Black areas</strong> → Cloud/cirrus masked out or no data; try broadening dates.</li>
+                <li><strong>Projection/CRS</strong> → Change <span class="sym">crs</span> (e.g., your local UTM) if needed.</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+                <li class="warn"><strong>ReferenceError: geometry is not defined</strong> → Rajzolj ROI‑t a térképen (vagy cseréld a <span class="sym">geometry</span> változót saját <span class="sym">ee.Geometry(...)</span> objektumra).</li>
+                <li><strong>Nincs export a Tasks fülön?</strong> → Előbb nyomd meg a <em>Run</em> gombot; az export ezután jelenik meg a <em>Tasks</em> alatt.</li>
+                <li><strong>Fekete területek</strong> → Felhő/cirrus maszkolás vagy adat‑hiány; bővítsd a dátumtartományt.</li>
+                <li><strong>Vetület/CRS</strong> → Szükség esetén módosítsd a <span class="sym">crs</span> értéket (pl. helyi UTM).</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="small"><span class="ok">Output:</span> GeoTIFF on Google Drive named <em>ndvi_s2_2024_growing_season.tif</em> (10 m, EPSG:4326).</td>
+            <td class="small"><span class="ok">Eredmény:</span> GeoTIFF a Google Drive‑on: <em>ndvi_s2_2024_growing_season.tif</em> (10 m, EPSG:4326).</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- MINI-ASSIGNMENT -->
+    <section class="card" aria-labelledby="assign">
+      <div class="bar">
+        <div>
+          <span id="assign" class="subtitle">📚 Mini‑assignment / Rövid feladat</span>
+          <div class="hint">Edit and rerun the script to answer.</div>
+        </div>
+      </div>
+      <table class="twocol" role="table" aria-describedby="assign">
+        <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
+        <thead><tr><th>EN</th><th>HU</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              1) Change the date range to <span class="sym">2024‑03‑01 … 2024‑11‑30</span>. Export again and report the file size (MB).<br/>
+              2) Switch the export <span class="sym">crs</span> to your local UTM zone and explain why this may help in GIS workflows.<br/>
+              3) Replace <span class="sym">median()</span> with <span class="sym">qualityMosaic('NDVI')</span> built from an interim NDVI collection (hint: map NDVI per image). Compare the visual difference in dense vegetation.
+            </td>
+            <td>
+              1) Állítsd a dátumtartományt <span class="sym">2024‑03‑01 … 2024‑11‑30</span> értékre. Exportálj újra, és jegyezd fel a fájlméretet (MB).<br/>
+              2) Állítsd az export <span class="sym">crs</span> értékét a helyi UTM zónára, és magyarázd el, miért lehet ez hasznos GIS folyamatoknál.<br/>
+              3) Cseréld a <span class="sym">median()</span> függvényt <span class="sym">qualityMosaic('NDVI')</span>‑ra egy ideiglenes NDVI gyűjteményből (tipp: térképezd az NDVI‑t képenként). Hasonlítsd össze a látványt sűrű növényzetnél.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+</body>
+</html>
