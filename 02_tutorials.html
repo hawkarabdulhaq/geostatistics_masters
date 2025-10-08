@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Download an NDVI Map (Sentinel‑2, 10 m) — EN / HU — University of Szeged</title>
+<title>Download an NDVI Map (Sentinel‑2, 10 m) — University of Szeged</title>
 <style>
   :root{
     --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
@@ -51,19 +51,11 @@
   .ok{color:var(--good); font-weight:700}
   .warn{color:var(--warn)}
 
-  /* BILINGUAL TABLE */
-  table.twocol{width:100%; border-collapse:separate; border-spacing:0}
-  thead th{background:linear-gradient(180deg, rgba(37,99,235,.08), rgba(56,189,248,.08)); padding:.85rem 1rem; text-align:left; font-weight:700; border-bottom:1px solid var(--border)}
-  tbody td{padding:.85rem 1rem; vertical-align:top; border-bottom:1px solid var(--border)}
-  tbody tr:nth-child(odd) td{background:var(--shade)}
-  .lang-label{display:inline-block; font-size:.75rem; font-weight:700; letter-spacing:.04em; padding:.2rem .5rem; border-radius:6px; background:rgba(56,189,248,.15); color:#0369a1; margin-left:.5rem}
-  .sym, code, kbd, pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
-
   /* CODE BLOCK */
   .codewrap{position:relative}
   pre{
     margin:0; padding:1rem; overflow:auto; background:#0b1020; color:#e6ebf5;
-    line-height:1.4; font-size:.95rem;
+    line-height:1.4; font-size:.95rem; border-top:1px solid var(--border);
   }
   .copybar{
     display:flex; align-items:center; justify-content:space-between; gap:.5rem;
@@ -73,6 +65,7 @@
   .copybtn:hover{border-color:var(--accent); color:var(--accent)}
   .small{font-size:.95rem; color:var(--muted)}
   ul,ol{margin:0; padding-left:1.2rem}
+  .section-pad{padding:1rem}
 </style>
 <script>
   function printPage(){ window.print(); }
@@ -86,7 +79,6 @@
       btn.textContent = 'Copied ✔';
       setTimeout(()=>btn.textContent=old,1200);
     }catch(e){
-      // Fallback
       const range = document.createRange();
       range.selectNodeContents(el);
       const sel = window.getSelection();
@@ -116,83 +108,54 @@
           </span>
         </div>
       </div>
-      <h2>Department of Atmospheric and Geospatial Data Science — EN / HU</h2>
+      <h2>Department of Atmospheric and Geospatial Data Science</h2>
     </header>
 
-    <!-- WHAT THIS DOES -->
+    <!-- GOAL -->
     <section class="card" aria-labelledby="intro">
       <div class="bar">
         <div>
-          <span id="intro" class="subtitle">Goal / Cél</span>
+          <span id="intro" class="subtitle">Goal</span>
           <div class="hint">One‑click NDVI export from Google Earth Engine (S2 SR harmonized, May–Sep 2024, 10 m).</div>
         </div>
         <div><button class="btn" onclick="printPage()">Print</button></div>
       </div>
-      <table class="twocol" role="table" aria-describedby="intro">
-        <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
-        <thead><tr><th>English <span class="lang-label">EN</span></th><th>Magyar <span class="lang-label">HU</span></th></tr></thead>
-        <tbody>
-          <tr>
-            <td>
-              This ready script masks clouds/cirrus, builds a median Sentinel‑2 composite, computes NDVI, shows it on the map, and exports a GeoTIFF to Google Drive.
-            </td>
-            <td>
-              A kész szkript felhő/cirrus maszkolást végez, medián Sentinel‑2 kompozitot készít, kiszámítja az NDVI‑t, térképre rajzolja, majd GeoTIFF‑et exportál a Google Drive‑ra.
-            </td>
-          </tr>
-          <tr>
-            <td class="call"><strong>Prerequisites:</strong> Earth Engine access and a ROI (“geometry”) drawn in the Code Editor.</td>
-            <td class="call"><strong>Előfeltételek:</strong> Earth Engine hozzáférés és egy ROI („geometry”) megrajzolása a Code Editorban.</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="section-pad">
+        <p>This ready script masks clouds/cirrus, builds a median Sentinel‑2 composite, computes NDVI, shows it on the map, and exports a GeoTIFF to Google Drive.</p>
+        <p class="call"><strong>Prerequisites:</strong> Earth Engine access and a ROI (“<span class="small">geometry</span>”) drawn in the Code Editor.</p>
+      </div>
     </section>
 
-    <!-- STEP-BY-STEP -->
+    <!-- STEPS -->
     <section class="card" aria-labelledby="steps">
       <div class="bar">
         <div>
-          <span id="steps" class="subtitle">Steps / Lépések</span>
+          <span id="steps" class="subtitle">Steps</span>
           <div class="hint">Follow in the Google Earth Engine Code Editor.</div>
         </div>
       </div>
-      <table class="twocol" role="table" aria-describedby="steps">
-        <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
-        <thead><tr><th>EN</th><th>HU</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>
-              1) Open the Code Editor and <strong>draw your ROI</strong> (polygon) — it creates a variable named <span class="sym">geometry</span>.<br/>
-              2) Paste the script below into a new script tab.<br/>
-              3) Click <strong>Run</strong> to preview NDVI.<br/>
-              4) In the <em>Tasks</em> tab, click <strong>Run</strong> on the export to send a GeoTIFF to Google Drive.
-            </td>
-            <td>
-              1) Nyisd meg a Code Editort és <strong>rajzold meg a ROI‑t</strong> (poligon) — létrejön a <span class="sym">geometry</span> változó.<br/>
-              2) Illeszd be a lenti kódot egy új szkriptbe.<br/>
-              3) Kattints a <strong>Run</strong> gombra az NDVI előnézetéhez.<br/>
-              4) A <em>Tasks</em> fülön kattints a <strong>Run</strong> gombra az exportáláshoz (GeoTIFF a Google Drive‑ra).
-            </td>
-          </tr>
-          <tr>
-            <td class="small"><span class="ok">Tip:</span> Adjust the date range for other seasons. Change <span class="sym">palette</span> or <span class="sym">min/max</span> for different color ramps.</td>
-            <td class="small"><span class="ok">Tipp:</span> Állítsd a dátumtartományt más időszakokra. A <span class="sym">palette</span> és <span class="sym">min/max</span> értékekkel módosítható a színezés.</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="section-pad">
+        <ol>
+          <li>Open the Code Editor and <strong>draw your ROI</strong> (polygon) — it creates a variable named <span class="small">geometry</span>.</li>
+          <li>Paste the script below into a new script tab.</li>
+          <li>Click <strong>Run</strong> to preview NDVI.</li>
+          <li>In the <em>Tasks</em> tab, click <strong>Run</strong> on the export to send a GeoTIFF to Google Drive.</li>
+        </ol>
+        <p class="small"><span class="ok">Tip:</span> Adjust the date range for other seasons. Change <span class="small">palette</span> or <span class="small">min/max</span> for different color ramps.</p>
+      </div>
     </section>
 
     <!-- CODE -->
     <section class="card" aria-labelledby="code">
       <div class="bar">
         <div>
-          <span id="code" class="subtitle">Ready‑to‑run Earth Engine Script / Kész Earth Engine szkript</span>
+          <span id="code" class="subtitle">Ready‑to‑run Earth Engine Script</span>
           <div class="hint">Sentinel‑2 SR harmonized, QA60 cloud &amp; cirrus mask, NDVI, Drive export.</div>
         </div>
       </div>
       <div class="codewrap">
         <div class="copybar">
-          <span class="small"><strong>Copy & paste</strong> into the Code Editor. Draw your ROI first so <span class="sym">geometry</span> exists.</span>
+          <span class="small"><strong>Copy & paste</strong> into the Code Editor. Draw your ROI first so <span class="small">geometry</span> exists.</span>
           <button id="copyBtn" class="copybtn" onclick="copyNDVI()">Copy code</button>
         </div>
         <pre id="geeCode">
@@ -237,66 +200,36 @@ Export.image.toDrive({
     <section class="card" aria-labelledby="checks">
       <div class="bar">
         <div>
-          <span id="checks" class="subtitle">Checklist & Troubleshooting / Ellenőrzőlista & hibakeresés</span>
+          <span id="checks" class="subtitle">Checklist & Troubleshooting</span>
           <div class="hint">Common issues and quick fixes.</div>
         </div>
       </div>
-      <table class="twocol" role="table" aria-describedby="checks">
-        <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
-        <thead><tr><th>EN</th><th>HU</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>
-              <ul>
-                <li class="warn"><strong>ReferenceError: geometry is not defined</strong> → Draw a ROI in the map (or replace <span class="sym">geometry</span> with your <span class="sym">ee.Geometry(...)</span>).</li>
-                <li><strong>No Tasks panel export?</strong> → Click <em>Run</em> first; the export appears under <em>Tasks</em>.</li>
-                <li><strong>Black areas</strong> → Cloud/cirrus masked out or no data; try broadening dates.</li>
-                <li><strong>Projection/CRS</strong> → Change <span class="sym">crs</span> (e.g., your local UTM) if needed.</li>
-              </ul>
-            </td>
-            <td>
-              <ul>
-                <li class="warn"><strong>ReferenceError: geometry is not defined</strong> → Rajzolj ROI‑t a térképen (vagy cseréld a <span class="sym">geometry</span> változót saját <span class="sym">ee.Geometry(...)</span> objektumra).</li>
-                <li><strong>Nincs export a Tasks fülön?</strong> → Előbb nyomd meg a <em>Run</em> gombot; az export ezután jelenik meg a <em>Tasks</em> alatt.</li>
-                <li><strong>Fekete területek</strong> → Felhő/cirrus maszkolás vagy adat‑hiány; bővítsd a dátumtartományt.</li>
-                <li><strong>Vetület/CRS</strong> → Szükség esetén módosítsd a <span class="sym">crs</span> értéket (pl. helyi UTM).</li>
-              </ul>
-            </td>
-          </tr>
-          <tr>
-            <td class="small"><span class="ok">Output:</span> GeoTIFF on Google Drive named <em>ndvi_s2_2024_growing_season.tif</em> (10 m, EPSG:4326).</td>
-            <td class="small"><span class="ok">Eredmény:</span> GeoTIFF a Google Drive‑on: <em>ndvi_s2_2024_growing_season.tif</em> (10 m, EPSG:4326).</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="section-pad">
+        <ul>
+          <li class="warn"><strong>ReferenceError: geometry is not defined</strong> → Draw a ROI in the map (or replace <span class="small">geometry</span> with your <span class="small">ee.Geometry(...)</span>).</li>
+          <li><strong>No Tasks panel export?</strong> → Click <em>Run</em> first; the export appears under <em>Tasks</em>.</li>
+          <li><strong>Black areas</strong> → Cloud/cirrus masked out or no data; try broadening dates.</li>
+          <li><strong>Projection/CRS</strong> → Change <span class="small">crs</span> (e.g., your local UTM) if needed.</li>
+        </ul>
+        <p class="small"><span class="ok">Output:</span> GeoTIFF on Google Drive named <em>ndvi_s2_2024_growing_season.tif</em> (10 m, EPSG:4326).</p>
+      </div>
     </section>
 
     <!-- MINI-ASSIGNMENT -->
     <section class="card" aria-labelledby="assign">
       <div class="bar">
         <div>
-          <span id="assign" class="subtitle">📚 Mini‑assignment / Rövid feladat</span>
+          <span id="assign" class="subtitle">Mini‑assignment</span>
           <div class="hint">Edit and rerun the script to answer.</div>
         </div>
       </div>
-      <table class="twocol" role="table" aria-describedby="assign">
-        <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
-        <thead><tr><th>EN</th><th>HU</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>
-              1) Change the date range to <span class="sym">2024‑03‑01 … 2024‑11‑30</span>. Export again and report the file size (MB).<br/>
-              2) Switch the export <span class="sym">crs</span> to your local UTM zone and explain why this may help in GIS workflows.<br/>
-              3) Replace <span class="sym">median()</span> with <span class="sym">qualityMosaic('NDVI')</span> built from an interim NDVI collection (hint: map NDVI per image). Compare the visual difference in dense vegetation.
-            </td>
-            <td>
-              1) Állítsd a dátumtartományt <span class="sym">2024‑03‑01 … 2024‑11‑30</span> értékre. Exportálj újra, és jegyezd fel a fájlméretet (MB).<br/>
-              2) Állítsd az export <span class="sym">crs</span> értékét a helyi UTM zónára, és magyarázd el, miért lehet ez hasznos GIS folyamatoknál.<br/>
-              3) Cseréld a <span class="sym">median()</span> függvényt <span class="sym">qualityMosaic('NDVI')</span>‑ra egy ideiglenes NDVI gyűjteményből (tipp: térképezd az NDVI‑t képenként). Hasonlítsd össze a látványt sűrű növényzetnél.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="section-pad">
+        <ol>
+          <li>Change the date range to <span class="small">2024‑03‑01 … 2024‑11‑30</span>. Export again and report the file size (MB).</li>
+          <li>Switch the export <span class="small">crs</span> to your local UTM zone and explain why this may help in GIS workflows.</li>
+          <li>Replace <span class="small">median()</span> with <span class="small">qualityMosaic('NDVI')</span> built from an interim NDVI collection (hint: map NDVI per image). Compare the visual difference in dense vegetation.</li>
+        </ol>
+      </div>
     </section>
 
   </div>
