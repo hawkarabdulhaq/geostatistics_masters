@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Task 6 — Key Probability Distributions (NDVI) — University of Szeged</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --accent:#2563eb; --accent-2:#38bdf8; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --shade:rgba(2,6,23,.06); --info:#0ea5e9; --good:#16a34a; --warn:#f59e0b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
+      --accent:#60a5fa; --accent-2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
+      --shade:rgba(255,255,255,.06); --info:#38bdf8; --good:#22c55e; --warn:#fbbf24;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  }
+  .wrap{max-width:1100px; margin-inline:auto}
+
+  /* HEADER */
+  header{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:.25rem .5rem; border-radius:999px}
+  h1{margin:0; font-size:1.35rem; font-weight:700}
+  h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
+  .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .logo-chip{display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.35rem .5rem; box-shadow:var(--shadow)}
+  .logo-chip img{display:block; height:42px; width:auto; object-fit:contain}
+  .logo-chip.logo-dept img{height:55px}
+  .logo-chip.logo-szte img{height:42px}
+
+  /* CARDS */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; margin-top:1rem; box-shadow:var(--shadow); overflow:hidden}
+  .bar{padding:.9rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .subtitle{font-weight:600}
+  .hint{color:var(--muted); font-size:.92rem}
+  .btn{border:1px solid var(--border); background:transparent; color:var(--ink); padding:.45rem .7rem; border-radius:10px; cursor:pointer; font-weight:600}
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .call{border-left:4px solid var(--info); background:rgba(14,165,233,.08); padding:.7rem .9rem; border-radius:10px}
+  .section-pad{padding:1rem}
+  ul,ol{margin:0; padding-left:1.2rem}
+  .small{font-size:.95rem; color:var(--muted)}
+  .sym, code, kbd, pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+
+  /* CODE BLOCKS */
+  .codewrap{position:relative}
+  pre{
+    margin:0; padding:1rem; overflow:auto; background:#0b1020; color:#e6ebf5;
+    line-height:1.4; font-size:.95rem; border-top:1px solid var(--border);
+  }
+  .copybar{
+    display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+    padding:.6rem .75rem; border-bottom:1px solid var(--border); background:var(--card);
+  }
+  .copybtn{border:1px solid var(--border); border-radius:8px; background:transparent; cursor:pointer; font-weight:700; padding:.35rem .6rem}
+  .copybtn:hover{border-color:var(--accent); color:var(--accent)}
+</style>
+<script>
+  function printPage(){ window.print(); }
+  async function copyCode(codeId, btnId){
+    const el = document.getElementById(codeId);
+    const txt = el.innerText;
+    try{
+      await navigator.clipboard.writeText(txt);
+      if(btnId){
+        const b = document.getElementById(btnId);
+        const old = b.textContent; b.textContent = 'Copied ✔';
+        setTimeout(()=> b.textContent = old, 1200);
+      }
+    }catch(e){
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      document.execCommand('copy'); s.removeAllRanges();
+      if(btnId) alert('Code copied.');
+    }
+  }
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HEADER -->
+    <header>
+      <div class="header-top">
+        <div class="title">
+          <span class="badge">University of Szeged</span>
+          <h1>Task 6 — Key Probability Distributions (≈30–45 min)</h1>
+        </div>
+        <div class="logo-row" aria-label="Department and University logos">
+          <span class="logo-chip logo-dept" title="Department logo">
+            <img src="https://geosci.u-szeged.hu/site/upload/2024/10/logo_v2_2_64x55.png" alt="Department of Atmospheric and Geospatial Data Science logo" />
+          </span>
+          <span class="logo-chip logo-szte" title="SZTE logo">
+            <img src="https://u-szeged.hu/site/design3/img/szte_logo_en.jpg" alt="University of Szeged logo (English)" />
+          </span>
+        </div>
+      </div>
+      <h2>Department of Atmospheric and Geospatial Data Science</h2>
+    </header>
+
+    <!-- OVERVIEW -->
+    <section class="card" aria-labelledby="overview">
+      <div class="bar">
+        <div>
+          <span id="overview" class="subtitle">Overview</span>
+          <div class="hint">Fit classic distributions to NDVI‑derived experiments; generate six diagnostic figures.</div>
+        </div>
+        <div><button class="btn" onclick="printPage()">Print</button></div>
+      </div>
+      <div class="section-pad">
+        <p><strong>Input:</strong><br/><span class="sym">/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif</span></p>
+        <div class="call">
+          <strong>You will produce:</strong>
+          <ul>
+            <li><strong>Code:</strong> <span class="sym">code/task06_distributions.py</span></li>
+            <li><strong>Figures:</strong>
+              <span class="sym">outputs/task06_binomial.png</span>,
+              <span class="sym">outputs/task06_geometric.png</span>,
+              <span class="sym">outputs/task06_poisson.png</span>,
+              <span class="sym">outputs/task06_exponential.png</span>,
+              <span class="sym">outputs/task06_gamma.png</span>,
+              <span class="sym">outputs/task06_normal_lognormal_beta.png</span>
+            </li>
+            <li><strong>Report:</strong> <span class="sym">reports/task06_report.md</span> (or PDF)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENDA -->
+    <section class="card" aria-labelledby="agenda">
+      <div class="bar">
+        <div>
+          <span id="agenda" class="subtitle">Agenda & Steps</span>
+          <div class="hint">Follow these checkpoints to complete Task 6.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ol>
+          <li><strong>0) Setup (1 min)</strong></li>
+          <li><strong>1) Run the script (5–7 min)</strong></li>
+          <li><strong>2) Inspect each figure (15–25 min)</strong></li>
+          <li><strong>3) Answer the final‑report prompts (10–12 min)</strong></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 0) SETUP -->
+    <section class="card" aria-labelledby="setup">
+      <div class="bar">
+        <div>
+          <span id="setup" class="subtitle">0) Setup (1 min)</span>
+          <div class="hint">Install packages (pure NumPy/matplotlib; no SciPy required here).</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copy0" class="copybtn" onclick="copyCode('block0','copy0')">Copy</button>
+        </div>
+        <pre id="block0">pip install rasterio numpy pandas matplotlib
+</pre>
+      </div>
+    </section>
+
+    <!-- 1) RUN -->
+    <section class="card" aria-labelledby="run">
+      <div class="bar">
+        <div>
+          <span id="run" class="subtitle">1) Run the script (5–7 min)</span>
+          <div class="hint">Save the file, then execute it from your repo root.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <p>Save the script below as <span class="sym">code/task06_distributions.py</span>, then run:</p>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copy1" class="copybtn" onclick="copyCode('block1','copy1')">Copy</button>
+        </div>
+        <pre id="block1">python code/task06_distributions.py
+</pre>
+      </div>
+      <div class="section-pad small">
+        It will print key statistics to the console and write all six figures into <span class="sym">outputs/</span>.
+      </div>
+    </section>
+
+    <!-- 2) INSPECT FIGURES -->
+    <section class="card" aria-labelledby="inspect">
+      <div class="bar">
+        <div>
+          <span id="inspect" class="subtitle">2) Inspect each figure (15–25 min)</span>
+          <div class="hint">Use the bullets below as a checklist while you view each PNG.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li><strong>Binomial:</strong> histogram of success counts vs Binomial(<span class="sym">n, p̂</span>) PMF.</li>
+          <li><strong>Geometric:</strong> trials‑to‑first‑success vs Geometric(<span class="sym">p̂</span>) PMF.</li>
+          <li><strong>Poisson:</strong> per‑cell high‑NDVI patch counts vs Poisson(<span class="sym">λ̂</span>).</li>
+          <li><strong>Exponential:</strong> inter‑hit distances on transects vs Exponential(<span class="sym">λ̂</span>).</li>
+          <li><strong>Gamma:</strong> sums of <span class="sym">k</span> inter‑hit distances vs Gamma(<span class="sym">k, θ̂</span>).</li>
+          <li><strong>Normal vs Lognormal (+ Beta alt):</strong> ROI NDVI histogram with fitted PDFs.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3) REPORT TEMPLATE -->
+    <section class="card" aria-labelledby="report">
+      <div class="bar">
+        <div>
+          <span id="report" class="subtitle">3) Final‑report prompts (copy into your report)</span>
+          <div class="hint">Paste into <span class="sym">reports/task06_report.md</span> and answer succinctly.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Markdown template</span>
+          <button id="copyT" class="copybtn" onclick="copyCode('blockT','copyT')">Copy</button>
+        </div>
+        <pre id="blockT"># Task 6 — Key Probability Distributions
+
+For each distribution you analyzed (≥4, or all):
+
+## Experiment
+- Describe clearly (e.g., “Binomial: n=100 pixels per replicate; success if NDVI ≥ 0.5.”)
+
+## Model assumptions & plausibility
+- Independence? Stationarity? “Rare events”? Constant p or λ?
+- Do spatial correlation, mixed land cover, or edges violate assumptions?
+
+## Evidence (visuals/statistics)
+- Reference the figure and printed SSE (or other metrics).
+- Where do theory and empirical diverge (tails, modes, zero-inflation)?
+
+## Interpretation in NDVI context
+- Binomial/Geometric: what does p̂ mean for your ROI?
+- Poisson/Exponential/Gamma: do patch counts and inter-hit distances behave like a Poisson process?
+- Normal vs Lognormal (+ Beta): which captures bounded/positive nature better, and why?
+
+## Conclusion
+- Which models are serviceable approximations for your ROI and season?
+- Any parameter choices (threshold, cell size) that materially change the story?
+</pre>
+      </div>
+    </section>
+
+    <!-- SCRIPT -->
+    <section class="card" aria-labelledby="script">
+      <div class="bar">
+        <div>
+          <span id="script" class="subtitle">The script — <span class="sym">code/task06_distributions.py</span> (ready to run)</span>
+          <div class="hint">Pure Python/NumPy implementation of six classic distribution checks.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Python</span>
+          <button id="copyPY" class="copybtn" onclick="copyCode('blockPY','copyPY')">Copy</button>
+        </div>
+        <pre id="blockPY">import os, math, json, collections
+import numpy as np
+import pandas as pd
+import rasterio as rio
+import matplotlib.pyplot as plt
+
+# ----------------------------
+# CONFIG
+# ----------------------------
+TIF_PATH = "/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif"
+OUT_DIR  = "/workspaces/geostatistics_masters/outputs"
+REPORTS  = "/workspaces/geostatistics_masters/reports"
+os.makedirs(OUT_DIR, exist_ok=True); os.makedirs(REPORTS, exist_ok=True)
+
+# "Vegetated" threshold for success/failure
+THRESH = 0.50
+
+# Binomial experiment
+BINOM_N = 100       # trials per replicate
+BINOM_REPS = 2000   # number of replicates
+
+# Geometric experiment
+GEOM_REPS = 5000
+
+# Poisson (patches per cell)
+TARGET_CELL_M = 250   # approx. cell size in meters
+MIN_PATCH_PIX = 2     # ignore tiny 1-pixel specks to reduce noise
+
+# Exponential/Gamma
+N_TRANSECTS = 24      # number of horizontal transects
+GAMMA_K = 3           # shape (integer) for gamma as sum of exponentials
+
+# -------------------------------------------------
+# Utility: pixel size in meters (works for proj or geographic)
+# -------------------------------------------------
+def meters_per_degree_lat(phi_rad: float) -> float: return 111320.0
+def meters_per_degree_lon(phi_rad: float) -> float: return 111320.0 * math.cos(phi_rad)
+
+def pixel_size_meters(src):
+    tr = src.transform; h, w = src.height, src.width
+    crs = src.crs
+    px_w = abs(tr.a); px_h = abs(tr.e)
+    lat_center = tr.f + tr.e * (h / 2.0)
+    if crs is not None and not crs.is_geographic:
+        return px_w, px_h, lat_center
+    phi = math.radians(lat_center)
+    return px_w * meters_per_degree_lon(phi), px_h * meters_per_degree_lat(phi), lat_center
+
+# -------------------------------------------------
+# Load NDVI
+# -------------------------------------------------
+assert os.path.exists(TIF_PATH), f"File not found: {TIF_PATH}"
+with rio.open(TIF_PATH) as src:
+    ndvi = src.read(1).astype("float32")
+    nodata = src.nodata
+    px_w_m, px_h_m, lat_c = pixel_size_meters(src)
+
+if nodata is not None:
+    ndvi = np.where(ndvi == nodata, np.nan, ndvi)
+
+valid = np.isfinite(ndvi)
+vals = ndvi[valid]
+assert vals.size > 0, "No valid NDVI pixels."
+
+p_hat = float((vals >= THRESH).sum() / vals.size)
+
+print("\n=== TASK 6: Key Distributions ===")
+print(f"NDVI valid pixels: {vals.size:,}")
+print(f"Vegetation threshold THRESH = {THRESH}")
+print(f"p_hat = P(NDVI >= THRESH) = {p_hat:.4f}")
+
+# -------------------------------------------------
+# Helpers for PMFs/PDFs
+# -------------------------------------------------
+def freedman_diaconis_bins(values, min_bins=20, max_bins=200):
+    q75, q25 = np.percentile(values, [75, 25])
+    iqr = max(q75 - q25, 1e-9)
+    n = values.size
+    h = 2.0 * iqr / (n ** (1.0 / 3.0))
+    data_range = values.max() - values.min()
+    if h <= 0 or not np.isfinite(h) or data_range <= 0: return 60
+    return int(np.clip(int(math.ceil(data_range / h)), min_bins, max_bins))
+
+def logchoose(n, k):
+    return math.lgamma(n+1) - math.lgamma(k+1) - math.lgamma(n-k+1)
+
+def binom_pmf_vec(n, p, ks):
+    ks = np.asarray(ks, dtype=int)
+    logp = ks * (math.log(p) if p>0 else -1e9) + (n-ks) * (math.log(1-p) if p<1 else -1e9)
+    lg = np.array([logchoose(n, k) for k in ks])
+    pmf = np.exp(lg + logp)
+    return pmf
+
+def poisson_pmf_vec(lam, ks):
+    ks = np.asarray(ks, dtype=int)
+    # pmf = e^{-lam} lam^k / k!
+    return np.exp(-lam + ks * math.log(lam) - np.array([math.lgamma(k+1) for k in ks]))
+
+def exponential_pdf(x, lam):
+    y = lam * np.exp(-lam * x)
+    y[x < 0] = 0.0
+    return y
+
+def gamma_pdf_k_int(x, k, theta):
+    # shape k integer, scale theta: f(x)= x^{k-1} e^{-x/theta} / (Gamma(k) theta^k)
+    x = np.asarray(x)
+    pdf = np.zeros_like(x, dtype=float)
+    mask = x > 0
+    if k < 1 or theta <= 0: return pdf
+    pdf[mask] = (x[mask] ** (k - 1)) * np.exp(-x[mask] / theta) / (math.factorial(k - 1) * (theta ** k))
+    return pdf
+
+def beta_params_moments(m, v):
+    # method-of-moments
+    # v &lt; m(1-m) required
+    t = m * (1 - m) / max(v, 1e-12) - 1
+    if t <= 0: return None, None
+    alpha = m * t
+    beta = (1 - m) * t
+    return alpha, beta
+
+def beta_pdf(x, a, b):
+    # safe via log-gamma
+    from math import lgamma, exp, log
+    x = np.asarray(x)
+    eps = 1e-9
+    x = np.clip(x, eps, 1 - eps)
+    logB = lgamma(a) + lgamma(b) - lgamma(a + b)
+    logpdf = (a - 1) * np.log(x) + (b - 1) * np.log(1 - x) - logB
+    return np.exp(logpdf)
+
+# -------------------------------------------------
+# 1) Binomial — successes in n draws
+# -------------------------------------------------
+rng = np.random.default_rng(42)
+# Sample directly from NDVI pixels (Bernoulli via threshold)
+binom_counts = []
+for _ in range(BINOM_REPS):
+    pick = rng.integers(0, vals.size, size=BINOM_N)
+    succ = int((vals[pick] >= THRESH).sum())
+    binom_counts.append(succ)
+binom_counts = np.array(binom_counts)
+
+ks = np.arange(0, BINOM_N + 1)
+pmf = binom_pmf_vec(BINOM_N, p_hat, ks)
+# empirical freq
+emp_freq = np.array([np.mean(binom_counts == k) for k in ks])
+sse_binom = float(np.sum((emp_freq - pmf) ** 2))
+
+plt.figure()
+plt.bar(ks, emp_freq, alpha=0.6, label="Empirical (freq)")
+plt.plot(ks, pmf, lw=1.2, label=f"Binomial(n={BINOM_N}, p̂={p_hat:.2f})")
+plt.xlabel("Successes (k) in n draws"); plt.ylabel("Probability")
+plt.title("Binomial: Success Count vs Theoretical PMF")
+plt.legend(); plt.tight_layout()
+plt.savefig(os.path.join(OUT_DIR, "task06_binomial.png"), dpi=150); plt.close()
+
+print(f"\n[Binomial] n={BINOM_N}, reps={BINOM_REPS}, SSE(empirical vs PMF)={sse_binom:.4e}")
+
+# -------------------------------------------------
+# 2) Geometric — trials until first success
+# -------------------------------------------------
+# Use Bernoulli(p̂) draws; NumPy geometric returns 1,2,3,...
+geom_samples = rng.geometric(p_hat, size=GEOM_REPS)
+kmax = int(np.percentile(geom_samples, 99))  # trim long tail for plot
+ks_geo = np.arange(1, kmax + 1)
+pmf_geo = (p_hat) * ((1 - p_hat) ** (ks_geo - 1))
+
+hist_counts, bin_edges = np.histogram(geom_samples, bins=np.arange(1, kmax + 2), density=True)
+centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+sse_geom = float(np.sum((hist_counts - pmf_geo) ** 2))
+
+plt.figure()
+plt.bar(centers, hist_counts, width=0.9, alpha=0.6, label="Empirical (density)")
+plt.plot(ks_geo, pmf_geo, lw=1.2, label="Geometric(p̂)")
+plt.xlabel("Trials to first success (k)"); plt.ylabel("Probability")
+plt.title("Geometric: Trials-to-First-Success vs PMF")
+plt.legend(); plt.tight_layout()
+plt.savefig(os.path.join(OUT_DIR, "task06_geometric.png"), dpi=150); plt.close()
+
+print(f"[Geometric] reps={GEOM_REPS}, SSE(empirical vs PMF)={sse_geom:.4e}")
+
+# -------------------------------------------------
+# 3) Poisson — patches per cell (connected components per cell)
+# -------------------------------------------------
+def count_components_4nb(binary2d, min_size=1):
+    H, W = binary2d.shape
+    visited = np.zeros_like(binary2d, dtype=bool)
+    count = 0
+    for i in range(H):
+        for j in range(W):
+            if binary2d[i, j] and not visited[i, j]:
+                # BFS
+                q = [(i, j)]
+                visited[i, j] = True
+                size = 0
+                while q:
+                    r, c = q.pop()
+                    size += 1
+                    for dr, dc in ((-1,0),(1,0),(0,-1),(0,1)):
+                        rr, cc = r + dr, c + dc
+                        if 0 <= rr < H and 0 <= cc < W and binary2d[rr, cc] and not visited[rr, cc]:
+                            visited[rr, cc] = True
+                            q.append((rr, cc))
+                if size >= min_size: count += 1
+    return count
+
+# build grid
+cell_w_px = max(1, int(round(TARGET_CELL_M / max(px_w_m, 1e-6))))
+cell_h_px = max(1, int(round(TARGET_CELL_M / max(px_h_m, 1e-6))))
+H, W = ndvi.shape
+Hc = (H // cell_h_px) * cell_h_px
+Wc = (W // cell_w_px) * cell_w_px
+ndvi_c = ndvi[:Hc, :Wc]
+mask_c = np.isfinite(ndvi_c)
+hi_c = (ndvi_c >= THRESH) & mask_c
+
+nrows = Hc // cell_h_px
+ncols = Wc // cell_w_px
+
+patch_counts = []
+for r in range(nrows):
+    for c in range(ncols):
+        blk = hi_c[r*cell_h_px:(r+1)*cell_h_px, c*cell_w_px:(c+1)*cell_w_px]
+        if blk.size == 0: continue
+        cnt = count_components_4nb(blk, min_size=MIN_PATCH_PIX)
+        patch_counts.append(cnt)
+patch_counts = np.array(patch_counts, dtype=int)
+lam_hat = float(np.mean(patch_counts)) if patch_counts.size else 0.0
+kmax = max(int(np.percentile(patch_counts, 99)), 5)
+ks_pois = np.arange(0, kmax + 1)
+pmf_pois = poisson_pmf_vec(lam_hat, ks_pois)
+
+hist_pois, edges_p = np.histogram(patch_counts, bins=np.arange(-0.5, kmax + 1.5, 1), density=True)
+centers_p = 0.5 * (edges_p[:-1] + edges_p[1:])
+sse_pois = float(np.sum((hist_pois - pmf_pois[:hist_pois.size]) ** 2))
+
+plt.figure()
+plt.bar(centers_p, hist_pois, width=0.9, alpha=0.6, label="Empirical (density)")
+plt.plot(ks_pois, pmf_pois, lw=1.2, label=f"Poisson(λ̂={lam_hat:.2f})")
+plt.xlabel("High-NDVI patch count per cell"); plt.ylabel("Probability")
+plt.title(f"Poisson: Patch Counts per ~{TARGET_CELL_M} m Cell")
+plt.legend(); plt.tight_layout()
+plt.savefig(os.path.join(OUT_DIR, "task06_poisson.png"), dpi=150); plt.close()
+
+print(f"[Poisson] cells={patch_counts.size}, λ̂={lam_hat:.3f}, SSE(emp vs PMF)={sse_pois:.4e}")
+
+# -------------------------------------------------
+# 4) Exponential — inter-hit distances on transects
+# -------------------------------------------------
+def interhit_distances(row_bool, px_m):
+    idx = np.flatnonzero(row_bool)
+    if idx.size < 2: return np.array([], dtype=float)
+    d = np.diff(idx) * px_m
+    return d[d > 0]
+
+hi = (ndvi >= THRESH) & np.isfinite(ndvi)
+rows = np.linspace(0, H-1, N_TRANSECTS + 2, dtype=int)[1:-1]  # avoid borders
+distances = []
+for r in rows:
+    distances.append(interhit_distances(hi[r, :], px_w_m))
+distances = np.concatenate([d for d in distances if d.size > 0]) if distances else np.array([])
+assert distances.size > 0, "No inter-hit distances found; try lowering THRESH or check data."
+
+lam_exp = 1.0 / float(np.mean(distances))
+bins = freedman_diaconis_bins(distances)
+hist_y, hist_e = np.histogram(distances, bins=bins, density=True)
+cent = 0.5 * (hist_e[:-1] + hist_e[1:])
+pdf_th = exponential_pdf(cent, lam_exp)
+sse_exp = float(np.sum((hist_y - pdf_th) ** 2))
+
+plt.figure()
+plt.step(cent, hist_y, where="mid", label=f"Empirical (bins~{bins})")
+xg = np.linspace(0, distances.max(), 400)
+plt.plot(xg, exponential_pdf(xg, lam_exp), lw=1.2, label=f"Exp(λ̂={lam_exp:.3f})")
+plt.xlabel("Distance between high-NDVI hits (m)"); plt.ylabel("Density")
+plt.title("Exponential: Inter-hit Distances on Transects")
+plt.grid(True, alpha=0.3); plt.legend(); plt.tight_layout()
+plt.savefig(os.path.join(OUT_DIR, "task06_exponential.png"), dpi=150); plt.close()
+
+print(f"[Exponential] samples={distances.size}, λ̂={lam_exp:.4f}, SSE(emp vs PDF)={sse_exp:.4e}")
+
+# -------------------------------------------------
+# 5) Gamma — sums of k inter-hit distances
+# -------------------------------------------------
+# Build sliding-window sums of size k across concatenated distances
+if distances.size >= GAMMA_K:
+    # simple non-overlapping blocks for clarity
+    n_blocks = (distances.size // GAMMA_K)
+    sums = distances[:n_blocks * GAMMA_K].reshape(n_blocks, GAMMA_K).sum(axis=1)
+    theta_hat = float(np.mean(sums) / GAMMA_K)  # scale
+    bins_g = freedman_diaconis_bins(sums)
+    hist_y, hist_e = np.histogram(sums, bins=bins_g, density=True)
+    cent = 0.5 * (hist_e[:-1] + hist_e[1:])
+    pdf_g = gamma_pdf_k_int(cent, GAMMA_K, theta_hat)
+    sse_gamma = float(np.sum((hist_y - pdf_g) ** 2))
+
+    plt.figure()
+    plt.step(cent, hist_y, where="mid", label=f"Empirical (bins~{bins_g})")
+    xg = np.linspace(0, sums.max(), 400)
+    plt.plot(xg, gamma_pdf_k_int(xg, GAMMA_K, theta_hat), lw=1.2,
+             label=f"Gamma(k={GAMMA_K}, θ̂={theta_hat:.2f})")
+    plt.xlabel(f"Sum of {GAMMA_K} inter-hit distances (m)"); plt.ylabel("Density")
+    plt.title("Gamma: Sums of Inter-hit Distances")
+    plt.grid(True, alpha=0.3); plt.legend(); plt.tight_layout()
+    plt.savefig(os.path.join(OUT_DIR, "task06_gamma.png"), dpi=150); plt.close()
+
+    print(f"[Gamma] samples={sums.size}, k={GAMMA_K}, θ̂={theta_hat:.3f}, SSE(emp vs PDF)={sse_gamma:.4e}")
+else:
+    print("[Gamma] Not enough distances to form sums; skipping figure.")
+
+# -------------------------------------------------
+# 6) Normal vs Lognormal (+ Beta alternative) on NDVI
+# -------------------------------------------------
+bins_all = freedman_diaconis_bins(vals)
+hist_y, hist_e = np.histogram(vals, bins=bins_all, density=True)
+cent = 0.5 * (hist_e[:-1] + hist_e[1:])
+
+mu = float(np.mean(vals)); sigma = float(np.std(vals))
+pdf_norm = (1.0/(sigma*np.sqrt(2*np.pi))) * np.exp(-0.5*((cent-mu)/sigma)**2)
+
+# Lognormal: only for positive NDVI (common for vegetated areas)
+pos = vals[vals > 0]
+pdf_logn = None
+if pos.size >= 100:
+    mlog = float(np.mean(np.log(pos))); slog = float(np.std(np.log(pos)))
+    xg = np.linspace(max(1e-6, pos.min()), pos.max(), 400)
+    pdf_logn = (1.0/(xg*slog*np.sqrt(2*np.pi))) * np.exp(-0.5*((np.log(xg)-mlog)/slog)**2)
+
+# Beta alternative on transformed NDVI to [0,1]
+x_beta = np.clip((vals + 1.0)/2.0, 0.0, 1.0)
+# avoid exact 0/1 for variance/moments
+eps = 1e-6
+x_beta = np.clip(x_beta, eps, 1-eps)
+mb, vb = float(np.mean(x_beta)), float(np.var(x_beta))
+a_hat, b_hat = beta_params_moments(mb, vb)
+
+plt.figure()
+plt.step(cent, hist_y, where="mid", label=f"NDVI histogram (bins~{bins_all})")
+plt.plot(cent, pdf_norm, lw=1.1, label=f"Normal(μ={mu:.2f}, σ={sigma:.2f})")
+if pdf_logn is not None:
+    plt.plot(xg, pdf_logn, lw=1.1, label="Lognormal (NDVI>0)")
+if a_hat is not None and b_hat is not None:
+    grid = np.linspace(0, 1, 400)
+    pdf_b = beta_pdf(grid, a_hat, b_hat)
+    # map grid back to NDVI: x_ndvi = 2*grid - 1 ; pdf_ndvi = pdf_beta * |dx/dx_ndvi| = pdf_beta * 0.5
+    grid_ndvi = 2*grid - 1
+    plt.plot(grid_ndvi, 0.5*pdf_b, lw=1.1, label=f"Beta (on (NDVI+1)/2)")
+plt.xlabel("NDVI"); plt.ylabel("Density")
+plt.title("Normal vs Lognormal (+ Beta alt) Fits to NDVI")
+plt.grid(True, alpha=0.3); plt.legend(); plt.tight_layout()
+plt.savefig(os.path.join(OUT_DIR, "task06_normal_lognormal_beta.png"), dpi=150); plt.close()
+
+print("[Normal/Lognormal/Beta] Wrote 'task06_normal_lognormal_beta.png'")
+
+print("\nFigures saved in:", OUT_DIR)
+</pre>
+      </div>
+    </section>
+
+    <!-- TIPS -->
+    <section class="card" aria-labelledby="tips">
+      <div class="bar">
+        <div>
+          <span id="tips" class="subtitle">Quick tips</span>
+          <div class="hint">Troubleshooting & interpretation notes.</div>
+        </div>
+      </div>
+      <div class="section-pad small">
+        <ul>
+          <li>If <em>Exponential</em> distances array is empty, lower <span class="sym">THRESH</span> (e.g., 0.45) or verify vegetation in the ROI.</li>
+          <li><em>Poisson</em> counts are sensitive to <span class="sym">TARGET_CELL_M</span> and <span class="sym">MIN_PATCH_PIX</span>.</li>
+          <li><em>Normal vs Lognormal vs Beta:</em> NDVI is bounded in [-1,1]; Beta (after mapping to [0,1]) often respects bounds better.</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
