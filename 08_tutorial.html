@@ -1,1 +1,436 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Task 7 — Central Limit Theorem (CLT) with NDVI — University of Szeged</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --accent:#2563eb; --accent-2:#38bdf8; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --info:#0ea5e9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
+      --accent:#60a5fa; --accent-2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
+      --info:#38bdf8;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  }
+  .wrap{max-width:1100px; margin-inline:auto}
+
+  /* HEADER */
+  header{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:.25rem .5rem; border-radius:999px}
+  h1{margin:0; font-size:1.35rem; font-weight:700}
+  h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
+  .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .logo-chip{display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.35rem .5rem; box-shadow:var(--shadow)}
+  .logo-chip img{display:block; height:42px; width:auto; object-fit:contain}
+  .logo-chip.logo-dept img{height:55px}
+  .logo-chip.logo-szte img{height:42px}
+
+  /* CARDS */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; margin-top:1rem; box-shadow:var(--shadow); overflow:hidden}
+  .bar{padding:.9rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .subtitle{font-weight:600}
+  .hint{color:var(--muted); font-size:.92rem}
+  .btn{border:1px solid var(--border); background:transparent; color:var(--ink); padding:.45rem .7rem; border-radius:10px; cursor:pointer; font-weight:600}
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .call{border-left:4px solid var(--info); background:rgba(14,165,233,.08); padding:.7rem .9rem; border-radius:10px}
+  .section-pad{padding:1rem}
+  ul,ol{margin:0; padding-left:1.2rem}
+  .small{font-size:.95rem; color:var(--muted)}
+  .sym, code, kbd, pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+
+  /* CODE BLOCKS */
+  .codewrap{position:relative}
+  pre{
+    margin:0; padding:1rem; overflow:auto; background:#0b1020; color:#e6ebf5;
+    line-height:1.4; font-size:.95rem; border-top:1px solid var(--border);
+  }
+  .copybar{
+    display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+    padding:.6rem .75rem; border-bottom:1px solid var(--border); background:var(--card);
+  }
+  .copybtn{border:1px solid var(--border); border-radius:8px; background:transparent; cursor:pointer; font-weight:700; padding:.35rem .6rem}
+  .copybtn:hover{border-color:var(--accent); color:var(--accent)}
+</style>
+<script>
+  function printPage(){ window.print(); }
+  async function copyCode(codeId, btnId){
+    const el = document.getElementById(codeId);
+    const txt = el.innerText;
+    try{
+      await navigator.clipboard.writeText(txt);
+      if(btnId){
+        const b = document.getElementById(btnId);
+        const old = b.textContent; b.textContent = 'Copied ✔';
+        setTimeout(()=> b.textContent = old, 1200);
+      }
+    }catch(e){
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      document.execCommand('copy'); s.removeAllRanges();
+      if(btnId) alert('Code copied.');
+    }
+  }
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HEADER -->
+    <header>
+      <div class="header-top">
+        <div class="title">
+          <span class="badge">University of Szeged</span>
+          <h1>Task 7 — Central Limit Theorem (CLT) with NDVI (≈30–40 min)</h1>
+        </div>
+        <div class="logo-row" aria-label="Department and University logos">
+          <span class="logo-chip logo-dept" title="Department logo">
+            <img src="https://geosci.u-szeged.hu/site/upload/2024/10/logo_v2_2_64x55.png" alt="Department of Atmospheric and Geospatial Data Science logo" />
+          </span>
+          <span class="logo-chip logo-szte" title="SZTE logo">
+            <img src="https://u-szeged.hu/site/design3/img/szte_logo_en.jpg" alt="University of Szeged logo (English)" />
+          </span>
+        </div>
+      </div>
+      <h2>Department of Atmospheric and Geospatial Data Science</h2>
+    </header>
+
+    <!-- OVERVIEW -->
+    <section class="card" aria-labelledby="overview">
+      <div class="bar">
+        <div>
+          <span id="overview" class="subtitle">Overview</span>
+          <div class="hint">Sample‑mean distributions from NDVI and Normal overlays for n = 10, 30, 100.</div>
+        </div>
+        <div><button class="btn" onclick="printPage()">Print</button></div>
+      </div>
+      <div class="section-pad">
+        <p><strong>Input:</strong><br/><span class="sym">/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif</span></p>
+        <div class="call">
+          <strong>You will produce:</strong>
+          <ul>
+            <li><strong>Code:</strong> <span class="sym">code/task07_clt.py</span></li>
+            <li><strong>Figures:</strong>
+              <span class="sym">outputs/task07_means_n10.png</span>,
+              <span class="sym">outputs/task07_means_n30.png</span>,
+              <span class="sym">outputs/task07_means_n100.png</span>
+            </li>
+            <li><strong>(Bonus CSV):</strong> <span class="sym">outputs/task07_stats.csv</span></li>
+            <li><strong>Report:</strong> <span class="sym">reports/task07_report.md</span> (or PDF)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENDA -->
+    <section class="card" aria-labelledby="agenda">
+      <div class="bar">
+        <div>
+          <span id="agenda" class="subtitle">Agenda & Steps</span>
+          <div class="hint">Follow these checkpoints to complete Task 7.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ol>
+          <li><strong>0) Setup (1 min)</strong></li>
+          <li><strong>1) Run the script (5–7 min)</strong></li>
+          <li><strong>2) Inspect outputs (10–15 min)</strong></li>
+          <li><strong>3) Reflect (10–12 min)</strong></li>
+          <li><strong>4) Write your short report (5–7 min)</strong></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 0) SETUP -->
+    <section class="card" aria-labelledby="setup">
+      <div class="bar">
+        <div>
+          <span id="setup" class="subtitle">0) Setup (1 min)</span>
+          <div class="hint">Install packages.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copy0" class="copybtn" onclick="copyCode('block0','copy0')">Copy</button>
+        </div>
+        <pre id="block0">pip install rasterio numpy pandas matplotlib
+</pre>
+      </div>
+    </section>
+
+    <!-- 1) RUN -->
+    <section class="card" aria-labelledby="run">
+      <div class="bar">
+        <div>
+          <span id="run" class="subtitle">1) Run the script (5–7 min)</span>
+          <div class="hint">Save then execute from your repo root.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <p>Save the script below as <span class="sym">code/task07_clt.py</span>, then run:</p>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copy1" class="copybtn" onclick="copyCode('block1','copy1')">Copy</button>
+        </div>
+        <pre id="block1">python code/task07_clt.py
+</pre>
+      </div>
+      <div class="section-pad small">
+        It computes sample‑mean distributions for n = 10, 30, 100 (default m = 3000 replicates), draws histograms, and overlays <span class="sym">Normal(μ̂, σ̂/√n)</span>. It also reports skewness and excess kurtosis.
+      </div>
+    </section>
+
+    <!-- 2) INSPECT -->
+    <section class="card" aria-labelledby="inspect">
+      <div class="bar">
+        <div>
+          <span id="inspect" class="subtitle">2) Inspect outputs (10–15 min)</span>
+          <div class="hint">Open the three figures and compare shape vs overlay.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li><span class="sym">outputs/task07_means_n10.png</span> — broadest histogram, visible skew/tails.</li>
+          <li><span class="sym">outputs/task07_means_n30.png</span> — tighter, more bell‑shaped.</li>
+          <li><span class="sym">outputs/task07_means_n100.png</span> — tight and close to normal overlay.</li>
+        </ul>
+        <p class="small">Check console and <span class="sym">outputs/task07_stats.csv</span> for mean, std, skewness, kurtosis_excess per n.</p>
+      </div>
+    </section>
+
+    <!-- 3) REFLECT -->
+    <section class="card" aria-labelledby="reflect">
+      <div class="bar">
+        <div>
+          <span id="reflect" class="subtitle">3) Reflect (10–12 min)</span>
+          <div class="hint">Use these prompts for discussion or notes.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li>How do skewness and excess kurtosis change as n grows?</li>
+          <li>Does the normal overlay visually match better for larger n?</li>
+          <li>What does that enable (confidence intervals, z‑tests on mean NDVI, etc.)?</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4) REPORT TEMPLATE -->
+    <section class="card" aria-labelledby="report">
+      <div class="bar">
+        <div>
+          <span id="report" class="subtitle">4) Report template (copy, fill, submit)</span>
+          <div class="hint">Create <span class="sym">reports/task07_report.md</span>.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Markdown template</span>
+          <button id="copyT" class="copybtn" onclick="copyCode('blockT','copyT')">Copy</button>
+        </div>
+        <pre id="blockT"># Task 7 — Central Limit Theorem (CLT) with NDVI
+
+## Why raw NDVI can be non-normal but means approach normal
+- Discuss heterogeneity, bounded support [-1, 1], mixed land cover (skew/multimodal),
+  versus CLT acting on averages as n grows.
+
+## What this enables in inference
+- With approx. normal sample-means for moderate/large n, we can build CIs for mean NDVI,
+  run z/t-style tests on differences of means, justify linear-model errors (with conditions).
+
+## Evidence from my figures/stats
+- Compare n=10 vs 30 vs 100 histograms and normal overlays.
+- Skewness and excess kurtosis trends (should move toward 0): ____
+- Does std_of_means ≈ σ̂/√n hold? Explain with numbers.
+
+## Caveats
+- Spatial correlation, non-IID sampling, seasonality, masking may slow convergence or bias the mean.
+- Observations in this ROI: ____
+</pre>
+      </div>
+    </section>
+
+    <!-- SCRIPT -->
+    <section class="card" aria-labelledby="script">
+      <div class="bar">
+        <div>
+          <span id="script" class="subtitle">The script — <span class="sym">code/task07_clt.py</span> (ready to run)</span>
+          <div class="hint">Pure NumPy/matplotlib implementation of CLT sampling on NDVI.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Python</span>
+          <button id="copyPY" class="copybtn" onclick="copyCode('blockPY','copyPY')">Copy</button>
+        </div>
+        <pre id="blockPY">import os, math
+import numpy as np
+import pandas as pd
+import rasterio as rio
+import matplotlib.pyplot as plt
+
+# ----------------------------
+# CONFIG
+# ----------------------------
+TIF_PATH   = "/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif"
+OUT_DIR    = "/workspaces/geostatistics_masters/outputs"
+REPORTS    = "/workspaces/geostatistics_masters/reports"
+os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(REPORTS, exist_ok=True)
+
+N_LIST     = [10, 30, 100]   # sample sizes
+REPLICATES = 3000            # m replicates per n
+RANDOM_SEED = 123
+
+# ----------------------------
+# Helpers
+# ----------------------------
+def freedman_diaconis_bins(values, min_bins=20, max_bins=200):
+    values = np.asarray(values)
+    q75, q25 = np.percentile(values, [75, 25])
+    iqr = max(q75 - q25, 1e-9)
+    n = values.size
+    h = 2.0 * iqr / (n ** (1.0 / 3.0))
+    data_range = values.max() - values.min()
+    if h <= 0 or not np.isfinite(h) or data_range <= 0:
+        return 60
+    bins = int(math.ceil(data_range / h))
+    return int(np.clip(bins, min_bins, max_bins))
+
+def skewness(x):
+    x = np.asarray(x, dtype=float)
+    m = np.mean(x)
+    c = x - m
+    m2 = np.mean(c**2)
+    if m2 <= 0:
+        return np.nan
+    m3 = np.mean(c**3)
+    return m3 / (m2 ** 1.5)
+
+def excess_kurtosis(x):
+    x = np.asarray(x, dtype=float)
+    m = np.mean(x)
+    c = x - m
+    m2 = np.mean(c**2)
+    if m2 <= 0:
+        return np.nan
+    m4 = np.mean(c**4)
+    return m4 / (m2 ** 2) - 3.0  # Fisher's excess kurtosis (0 for Normal)
+
+def normal_pdf(x, mu, sigma):
+    x = np.asarray(x, dtype=float)
+    if sigma <= 0:
+        return np.zeros_like(x)
+    return (1.0/(sigma*np.sqrt(2*np.pi))) * np.exp(-0.5 * ((x - mu)/sigma)**2)
+
+# ----------------------------
+# Load NDVI
+# ----------------------------
+assert os.path.exists(TIF_PATH), f"File not found: {TIF_PATH}"
+with rio.open(TIF_PATH) as src:
+    ndvi = src.read(1).astype("float32")
+    nodata = src.nodata
+
+if nodata is not None:
+    ndvi = np.where(ndvi == nodata, np.nan, ndvi)
+
+vals = ndvi[np.isfinite(ndvi)]
+assert vals.size > 0, "No valid NDVI pixels found."
+
+mu_hat   = float(np.mean(vals))
+sigma_hat= float(np.std(vals))  # population std of raw NDVI
+print(f"\\nRaw NDVI: μ̂={mu_hat:.4f}, σ̂={sigma_hat:.4f}, N_valid={vals.size:,}")
+
+# ----------------------------
+# CLT Experiments
+# ----------------------------
+rng = np.random.default_rng(RANDOM_SEED)
+all_stats = []
+
+for n in N_LIST:
+    # draw replicates (with replacement) and compute sample means
+    idx = rng.integers(0, vals.size, size=(REPLICATES, n))
+    samples = vals[idx]
+    means = samples.mean(axis=1)
+
+    # empirical shape metrics
+    m_mean = float(np.mean(means))
+    m_std  = float(np.std(means))
+    m_skw  = float(skewness(means))
+    m_krt  = float(excess_kurtosis(means))
+
+    # theoretical Normal overlay: N(μ̂, σ̂/sqrt(n))
+    sigma_n = sigma_hat / math.sqrt(n) if sigma_hat > 0 else 0.0
+
+    # histogram & overlay
+    bins = freedman_diaconis_bins(means)
+    hist_y, hist_edges = np.histogram(means, bins=bins, density=True)
+    centers = 0.5 * (hist_edges[:-1] + hist_edges[1:])
+    pdf_norm = normal_pdf(centers, mu_hat, sigma_n)
+
+    # figure
+    plt.figure(figsize=(7.6, 5))
+    plt.step(centers, hist_y, where="mid", label=f"Empirical means (m={REPLICATES}, bins~{bins})")
+    plt.plot(centers, pdf_norm, lw=1.3, label=f"Normal(μ̂, σ̂/√n) with n={n}")
+    plt.xlabel("Sample mean of NDVI")
+    plt.ylabel("Density")
+    plt.title(f"CLT: Distribution of Sample Means (n={n})")
+    plt.grid(True, alpha=0.3)
+    # annotate stats
+    txt = f"mean={m_mean:.3f}  std={m_std:.3f}\\nskew={m_skw:.3f}  excess kurtosis={m_krt:.3f}"
+    plt.gca().text(0.02, 0.98, txt, transform=plt.gca().transAxes,
+                   va="top", ha="left", fontsize=9,
+                   bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="0.8", alpha=0.9))
+    plt.legend()
+    out_png = os.path.join(OUT_DIR, f"task07_means_n{n}.png")
+    plt.tight_layout()
+    plt.savefig(out_png, dpi=150)
+    plt.close()
+
+    all_stats.append({
+        "n": n,
+        "replicates": REPLICATES,
+        "mean_of_means": m_mean,
+        "std_of_means": m_std,
+        "skewness": m_skw,
+        "excess_kurtosis": m_krt,
+        "theory_sigma_n": sigma_n
+    })
+
+    print(f"\\n[CLT] n={n}:"
+          f" mean={m_mean:.4f}, std={m_std:.4f}, skew={m_skw:.4f}, kurt_excess={m_krt:.4f}"
+          f"  -> wrote {out_png}")
+
+# save stats table
+df = pd.DataFrame(all_stats)
+df.to_csv(os.path.join(OUT_DIR, "task07_stats.csv"), index=False)
+
+print("\\nOutputs written:")
+for n in N_LIST:
+    print(f" - {os.path.join(OUT_DIR, f'task07_means_n{n}.png')}")
+print(f" - {os.path.join(OUT_DIR, 'task07_stats.csv')}")
+print("\\nInterpretation tip: As n increases, std should shrink ~ σ̂/√n, and skew/kurtosis should move toward 0.")
+</pre>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
