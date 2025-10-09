@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Codespaces Walkthrough — NDVI Validation & Reporting — University of Szeged</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --accent:#2563eb; --accent-2:#38bdf8; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --shade:rgba(2,6,23,.06); --info:#0ea5e9; --good:#16a34a; --warn:#f59e0b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
+      --accent:#60a5fa; --accent-2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
+      --shade:rgba(255,255,255,.06); --info:#38bdf8; --good:#22c55e; --warn:#fbbf24;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  }
+  .wrap{max-width:1100px; margin-inline:auto}
+
+  /* HEADER */
+  header{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:.25rem .5rem; border-radius:999px}
+  h1{margin:0; font-size:1.35rem; font-weight:700}
+  h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
+  .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .logo-chip{display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.35rem .5rem; box-shadow:var(--shadow)}
+  .logo-chip img{display:block; height:42px; width:auto; object-fit:contain}
+  .logo-chip.logo-dept img{height:55px}
+  .logo-chip.logo-szte img{height:42px}
+
+  /* CARDS */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; margin-top:1rem; box-shadow:var(--shadow); overflow:hidden}
+  .bar{padding:.9rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .subtitle{font-weight:600}
+  .hint{color:var(--muted); font-size:.92rem}
+  .btn{border:1px solid var(--border); background:transparent; color:var(--ink); padding:.45rem .7rem; border-radius:10px; cursor:pointer; font-weight:600}
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .call{border-left:4px solid var(--info); background:rgba(14,165,233,.08); padding:.7rem .9rem; border-radius:10px}
+  .ok{color:var(--good); font-weight:700}
+  .warn{color:var(--warn); font-weight:600}
+
+  /* CONTENT */
+  .section-pad{padding:1rem}
+  ul,ol{margin:0; padding-left:1.2rem}
+  .small{font-size:.95rem; color:var(--muted)}
+  .sym, code, kbd, pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+
+  /* CODE BLOCKS */
+  .codewrap{position:relative}
+  pre{
+    margin:0; padding:1rem; overflow:auto; background:#0b1020; color:#e6ebf5;
+    line-height:1.4; font-size:.95rem; border-top:1px solid var(--border);
+  }
+  .copybar{
+    display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+    padding:.6rem .75rem; border-bottom:1px solid var(--border); background:var(--card);
+  }
+  .copybtn{border:1px solid var(--border); border-radius:8px; background:transparent; cursor:pointer; font-weight:700; padding:.35rem .6rem}
+  .copybtn:hover{border-color:var(--accent); color:var(--accent)}
+</style>
+<script>
+  function printPage(){ window.print(); }
+  async function copyCode(codeId, btnId){
+    const el = document.getElementById(codeId);
+    const txt = el.innerText;
+    try{
+      await navigator.clipboard.writeText(txt);
+      if(btnId){
+        const b = document.getElementById(btnId);
+        const old = b.textContent; b.textContent = 'Copied ✔';
+        setTimeout(()=> b.textContent = old, 1200);
+      }
+    }catch(e){
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      document.execCommand('copy'); s.removeAllRanges();
+      if(btnId) alert('Code copied.');
+    }
+  }
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HEADER -->
+    <header>
+      <div class="header-top">
+        <div class="title">
+          <span class="badge">University of Szeged</span>
+          <h1>Codespaces Walkthrough — Validate & Report Your NDVI Raster</h1>
+        </div>
+        <div class="logo-row" aria-label="Department and University logos">
+          <span class="logo-chip logo-dept" title="Department logo">
+            <img src="https://geosci.u-szeged.hu/site/upload/2024/10/logo_v2_2_64x55.png" alt="Department of Atmospheric and Geospatial Data Science logo" />
+          </span>
+          <span class="logo-chip logo-szte" title="SZTE logo">
+            <img src="https://u-szeged.hu/site/design3/img/szte_logo_en.jpg" alt="University of Szeged logo (English)" />
+          </span>
+        </div>
+      </div>
+      <h2>Department of Atmospheric and Geospatial Data Science</h2>
+    </header>
+
+    <!-- INTRO -->
+    <section class="card" aria-labelledby="intro">
+      <div class="bar">
+        <div>
+          <span id="intro" class="subtitle">Context</span>
+          <div class="hint">After you upload <span class="sym">ndvi_s2_2024_growing_season.tif</span> to your Codespace, complete the steps below.</div>
+        </div>
+        <div><button class="btn" onclick="printPage()">Print</button></div>
+      </div>
+      <div class="section-pad">
+        <h3>Agenda at a glance (≈ 20–25 minutes)</h3>
+        <ol>
+          <li><strong>(2 min)</strong> Re‑run Step‑2 script and sanity‑check outputs</li>
+          <li><strong>(3 min)</strong> Explore outputs in the Codespaces UI (images, CSV)</li>
+          <li><strong>(3 min)</strong> Create a lightweight report (Markdown) and preview it</li>
+          <li><strong>(3 min)</strong> Add a minimal Python environment file (<span class="sym">requirements.txt</span>)</li>
+          <li><strong>(4 min)</strong> Debugger tour: set a breakpoint, inspect variables</li>
+          <li><strong>(3 min)</strong> Make a <em>playground copy</em> for safe tinkering</li>
+          <li><strong>(3–7 min)</strong> Version control: stage → commit → push (and <span class="sym">.gitignore</span>)</li>
+        </ol>
+        <div class="call">
+          <strong>Deliverables:</strong>
+          <ul>
+            <li><span class="sym">outputs/task02_summary.csv</span>, <span class="sym">outputs/task02_quicklook.png</span>, <span class="sym">outputs/task02_hist.png</span></li>
+            <li><span class="sym">reports/task02_codespace_walkthrough.md</span></li>
+            <li><span class="sym">requirements.txt</span></li>
+            <li>A clean commit that captures your work</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREREQS -->
+    <section class="card" aria-labelledby="prereq">
+      <div class="bar">
+        <div>
+          <span id="prereq" class="subtitle">0) Prereqs (run once) — 1 minute</span>
+          <div class="hint">Open <strong>View → Terminal</strong> and verify Python + packages.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal commands</span>
+          <button id="copy1" class="copybtn" onclick="copyCode('block1','copy1')">Copy code</button>
+        </div>
+        <pre id="block1">python --version
+pip install rasterio matplotlib pandas numpy
+</pre>
+      </div>
+    </section>
+
+    <!-- STEP 1 -->
+    <section class="card" aria-labelledby="s1">
+      <div class="bar">
+        <div>
+          <span id="s1" class="subtitle">1) Re‑run the validator/visualizer — 2 minutes</span>
+          <div class="hint">From the repo root.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copy2" class="copybtn" onclick="copyCode('block2','copy2')">Copy code</button>
+        </div>
+        <pre id="block2">python code/task02_verify_ndvi.py
+</pre>
+      </div>
+      <div class="section-pad">
+        <p><strong>You should see</strong> a console summary ending with three files in <span class="sym">outputs/</span>. If warnings appear (range outside ~[-1,1], band count ≠ 1, very low % valid, CRS note), read them. Warnings are prompts to investigate, not automatic failures.</p>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="card" aria-labelledby="s2">
+      <div class="bar">
+        <div>
+          <span id="s2" class="subtitle">2) Explore outputs in the UI — 3 minutes</span>
+          <div class="hint">Use the Explorer pane.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li><span class="sym">outputs/task02_quicklook.png</span> — spatial check</li>
+          <li><span class="sym">outputs/task02_hist.png</span> — histogram shape</li>
+          <li><span class="sym">outputs/task02_summary.csv</span> — stats (mean, std, valid %, min/max, percentiles)</li>
+        </ul>
+        <p class="small"><strong>Tip:</strong> Right‑click → <em>Open Preview</em> for in‑editor image view.</p>
+        <p class="call"><strong>Micro‑reflection:</strong> Do min/mean/max align with expectations for your ROI/season? Any many NaNs (clouds/water/edge)?</p>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="card" aria-labelledby="s3">
+      <div class="bar">
+        <div>
+          <span id="s3" class="subtitle">3) Write a short report (Markdown) — 3 minutes</span>
+          <div class="hint">Create <span class="sym">reports/task02_codespace_walkthrough.md</span>.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Markdown template</span>
+          <button id="copy3" class="copybtn" onclick="copyCode('block3','copy3')">Copy code</button>
+        </div>
+        <pre id="block3"># Task 2 — Codespaces Walkthrough Report
+
+## What I validated
+- I confirmed the file is present at `/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif`.
+- The script produced:
+  - `outputs/task02_summary.csv`
+  - `outputs/task02_quicklook.png`
+  - `outputs/task02_hist.png`
+
+## Key stats (from CSV)
+- Mean NDVI: ___
+- Std dev: ___
+- Valid %: ___
+- Min / Max: ___ / ___
+- Notes on percentiles (p05–p95): ___
+
+## Visual checks
+- **Quicklook:** What stands out (e.g., water/urban/forest patterns)?
+- **Histogram:** Is it skewed? Bimodal? What might that imply?
+
+## Any warnings and my interpretation
+- (e.g., range, CRS, valid%) → what I think it means and next steps.
+
+## Next steps
+- (Examples) Try different date windows; add clip to ROI mask; compare sub‑regions.
+</pre>
+      </div>
+      <div class="section-pad small">In VS Code: open the file and press <strong>Ctrl/Cmd+Shift+V</strong> for Markdown Preview.</div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="card" aria-labelledby="s4">
+      <div class="bar">
+        <div>
+          <span id="s4" class="subtitle">4) Capture your environment — 3 minutes</span>
+          <div class="hint">Create a minimal <span class="sym">requirements.txt</span>.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Create minimal requirements</span>
+          <button id="copy4" class="copybtn" onclick="copyCode('block4','copy4')">Copy code</button>
+        </div>
+        <pre id="block4">printf "rasterio\nmatplotlib\npandas\nnumpy\n" > requirements.txt
+</pre>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Optional: pin versions</span>
+          <button id="copy5" class="copybtn" onclick="copyCode('block5','copy5')">Copy code</button>
+        </div>
+        <pre id="block5">pip freeze | egrep 'rasterio|matplotlib|pandas|numpy' >> requirements.txt
+sort -u requirements.txt -o requirements.txt
+</pre>
+      </div>
+    </section>
+
+    <!-- STEP 5 -->
+    <section class="card" aria-labelledby="s5">
+      <div class="bar">
+        <div>
+          <span id="s5" class="subtitle">5) Debugger tour — set a breakpoint and inspect — 4 minutes</span>
+          <div class="hint">Use <em>Run and Debug</em> → <strong>Python: Current File</strong>.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ol>
+          <li>Open <span class="sym">code/task02_verify_ndvi.py</span>.</li>
+          <li>Set a breakpoint at: <span class="sym">with rio.open(tif_path) as src:</span></li>
+          <li>Run the debugger; when paused, inspect <strong>Variables</strong>:
+            <ul>
+              <li><span class="sym">profile</span> (driver, width, height, crs)</li>
+              <li><span class="sym">band1.shape</span>, hover a slice</li>
+              <li><span class="sym">nodata</span></li>
+            </ul>
+          </li>
+          <li>Step over (F10) to watch <span class="sym">summary</span> populate, then continue (F5).</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- STEP 6 -->
+    <section class="card" aria-labelledby="s6">
+      <div class="bar">
+        <div>
+          <span id="s6" class="subtitle">6) Make a playground copy — 3 minutes</span>
+          <div class="hint">Keep the original unchanged; experiment safely in a copy.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Create + run a play copy</span>
+          <button id="copy6" class="copybtn" onclick="copyCode('block6','copy6')">Copy code</button>
+        </div>
+        <pre id="block6">mkdir -p code/playground
+cp code/task02_verify_ndvi.py code/playground/task02_verify_ndvi_play.py
+python code/playground/task02_verify_ndvi_play.py
+</pre>
+      </div>
+      <div class="section-pad small">
+        Try tweaks: bins 60→80, robust stretch 1–99% (instead of 2–98%), different DPI, add a focused histogram for NDVI ≥ 0.3.
+      </div>
+    </section>
+
+    <!-- STEP 7 -->
+    <section class="card" aria-labelledby="s7">
+      <div class="bar">
+        <div>
+          <span id="s7" class="subtitle">7) Version control — stage → commit → push — 3–7 minutes</span>
+          <div class="hint">Add a <span class="sym">.gitignore</span> so large rasters don’t get committed.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Create .gitignore</span>
+          <button id="copy7" class="copybtn" onclick="copyCode('block7','copy7')">Copy code</button>
+        </div>
+        <pre id="block7">printf "data/\n*.tif\n__pycache__/\n*.ipynb_checkpoints/\n" > .gitignore
+</pre>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Stage, commit, push</span>
+          <button id="copy8" class="copybtn" onclick="copyCode('block8','copy8')">Copy code</button>
+        </div>
+        <pre id="block8">git add outputs/ reports/ code/task02_verify_ndvi.py requirements.txt .gitignore
+git commit -m "Task 2: NDVI validation outputs + Codespaces walkthrough + requirements"
+git push
+</pre>
+      </div>
+      <div class="section-pad small">
+        Check your repo to confirm the images, CSV, and report are there. Good hygiene now saves pain later.
+      </div>
+    </section>
+
+    <!-- REFERENCE SCRIPT -->
+    <section class="card" aria-labelledby="refscript">
+      <div class="bar">
+        <div>
+          <span id="refscript" class="subtitle">(Reference) The exact Step‑2 script (unchanged)</span>
+          <div class="hint">Reads the GeoTIFF, validates stats, writes PNGs/CSV to <span class="sym">outputs/</span>.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Python script</span>
+          <button id="copy9" class="copybtn" onclick="copyCode('block9','copy9')">Copy code</button>
+        </div>
+        <pre id="block9">import os, json, warnings
+import numpy as np
+import pandas as pd
+import rasterio as rio
+import matplotlib.pyplot as plt
+
+# ---- paths ----
+tif_path = "/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif"
+out_dir  = "/workspaces/geostatistics_masters/outputs"
+os.makedirs(out_dir, exist_ok=True)
+
+assert os.path.exists(tif_path), f"File not found: {tif_path}"
+
+# ---- open + metadata ----
+with rio.open(tif_path) as src:
+    profile = src.profile.copy()
+    band1 = src.read(1).astype("float32")
+    nodata = src.nodata
+
+# mask NoData → NaN
+if nodata is not None:
+    band1 = np.where(band1 == nodata, np.nan, band1)
+
+valid = np.isfinite(band1)
+vals  = band1[valid]
+
+# ---- basic stats ----
+summary = {
+    "path": tif_path,
+    "driver": profile.get("driver"),
+    "width": profile.get("width"),
+    "height": profile.get("height"),
+    "count_bands": profile.get("count"),
+    "dtype": str(profile.get("dtype")),
+    "crs": str(profile.get("crs")),
+    "transform": str(profile.get("transform")),
+    "valid_pixels": int(valid.sum()),
+    "total_pixels": int(band1.size),
+    "pct_valid": float(100.0 * valid.sum() / band1.size),
+    "min": float(np.nanmin(vals)) if vals.size else np.nan,
+    "p01": float(np.nanpercentile(vals, 1)) if vals.size else np.nan,
+    "p05": float(np.nanpercentile(vals, 5)) if vals.size else np.nan,
+    "median": float(np.nanmedian(vals)) if vals.size else np.nan,
+    "mean": float(np.nanmean(vals)) if vals.size else np.nan,
+    "std": float(np.nanstd(vals)) if vals.size else np.nan,
+    "p95": float(np.nanpercentile(vals, 95)) if vals.size else np.nan,
+    "p99": float(np.nanpercentile(vals, 99)) if vals.size else np.nan,
+    "max": float(np.nanmax(vals)) if vals.size else np.nan,
+}
+pd.DataFrame([summary]).to_csv("outputs/task02_summary.csv", index=False)
+
+with open(f"{out_dir}/task02_summary.json","w") as f:
+    json.dump(summary, f, indent=2)
+
+# ---- quick validations ----
+warnings_list = []
+if summary["count_bands"] != 1:
+    warnings_list.append("Expected a single-band NDVI raster.")
+if summary["min"] < -1.2 or summary["max"] > 1.2:
+    warnings_list.append("NDVI range should be ~[-1, 1]; values outside may indicate scaling issues.")
+if summary["pct_valid"] < 30:
+    warnings_list.append("Very low % of valid pixels; cloud mask or export region might be off.")
+if "EPSG:4326" not in summary["crs"] and "4326" not in summary["crs"]:
+    warnings_list.append(f"CRS is {summary['crs']} (not EPSG:4326). This is OK, just be aware of units.")
+
+# ---- histogram ----
+if vals.size:
+    plt.figure()
+    plt.hist(vals, bins=60)
+    plt.title("NDVI histogram")
+    plt.xlabel("NDVI"); plt.ylabel("Frequency")
+    plt.savefig(f"{out_dir}/task02_hist.png", dpi=150)
+    plt.close()
+
+# ---- quicklook (robust stretch) ----
+if vals.size:
+    vmin = np.nanpercentile(vals, 2)
+    vmax = np.nanpercentile(vals, 98)
+    if not np.isfinite(vmin) or not np.isfinite(vmax) or vmin >= vmax:
+        vmin, vmax = -0.2, 0.9
+
+    plt.figure()
+    plt.imshow(band1, vmin=vmin, vmax=vmax)
+    plt.colorbar(label="NDVI")
+    plt.title("NDVI quicklook (robust 2–98% stretch)")
+    plt.axis("off")
+    plt.savefig(f"{out_dir}/task02_quicklook.png", dpi=150, bbox_inches="tight")
+    plt.close()
+
+# ---- console summary ----
+print("\n=== NDVI VALIDATION SUMMARY ===")
+for k, v in summary.items():
+    print(f"{k:>14}: {v}")
+
+if warnings_list:
+    print("\nWARNINGS:")
+    for w in warnings_list:
+        print(f" - {w}")
+else:
+    print("\n✅ Looks like a valid NDVI float raster.")
+print(f"\nWrote: {out_dir}/task02_summary.csv")
+print(f"      {out_dir}/task02_quicklook.png")
+print(f"      {out_dir}/task02_hist.png")
+</pre>
+      </div>
+    </section>
+
+    <!-- OPTIONAL -->
+    <section class="card" aria-labelledby="opt">
+      <div class="bar">
+        <div>
+          <span id="opt" class="subtitle">Optional extensions (if you have extra time)</span>
+          <div class="hint">Ideas to deepen the workflow.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li><strong>Jupyter in Codespaces:</strong> Load <span class="sym">outputs/task02_summary.csv</span>, re‑plot histograms, compute more metrics.</li>
+          <li><strong>Compare two rasters:</strong> Export another month’s NDVI, make new quicklook + histogram; note seasonal differences.</li>
+          <li><strong>Automate:</strong> Wrap the script with <span class="sym">argparse</span> to pass different input paths and output dirs.</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
