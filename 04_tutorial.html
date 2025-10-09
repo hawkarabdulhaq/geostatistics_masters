@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tutorial — Probability with NDVI (Step 3) — University of Szeged</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --accent:#2563eb; --accent-2:#38bdf8; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --shade:rgba(2,6,23,.06); --info:#0ea5e9; --good:#16a34a; --warn:#f59e0b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
+      --accent:#60a5fa; --accent-2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
+      --shade:rgba(255,255,255,.06); --info:#38bdf8; --good:#22c55e; --warn:#fbbf24;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  }
+  .wrap{max-width:1100px; margin-inline:auto}
+
+  /* HEADER */
+  header{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:.25rem .5rem; border-radius:999px}
+  h1{margin:0; font-size:1.35rem; font-weight:700}
+  h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
+  .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .logo-chip{display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.35rem .5rem; box-shadow:var(--shadow)}
+  .logo-chip img{display:block; height:42px; width:auto; object-fit:contain}
+  .logo-chip.logo-dept img{height:55px}
+  .logo-chip.logo-szte img{height:42px}
+
+  /* CARDS */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; margin-top:1rem; box-shadow:var(--shadow); overflow:hidden}
+  .bar{padding:.9rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .subtitle{font-weight:600}
+  .hint{color:var(--muted); font-size:.92rem}
+  .btn{border:1px solid var(--border); background:transparent; color:var(--ink); padding:.45rem .7rem; border-radius:10px; cursor:pointer; font-weight:600}
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .call{border-left:4px solid var(--info); background:rgba(14,165,233,.08); padding:.7rem .9rem; border-radius:10px}
+  .ok{color:var(--good); font-weight:700}
+  .warn{color:var(--warn); font-weight:600}
+  .section-pad{padding:1rem}
+  ul,ol{margin:0; padding-left:1.2rem}
+  .small{font-size:.95rem; color:var(--muted)}
+  .sym, code, kbd, pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+
+  /* CODE BLOCKS */
+  .codewrap{position:relative}
+  pre{
+    margin:0; padding:1rem; overflow:auto; background:#0b1020; color:#e6ebf5;
+    line-height:1.4; font-size:.95rem; border-top:1px solid var(--border);
+  }
+  .copybar{
+    display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+    padding:.6rem .75rem; border-bottom:1px solid var(--border); background:var(--card);
+  }
+  .copybtn{border:1px solid var(--border); border-radius:8px; background:transparent; cursor:pointer; font-weight:700; padding:.35rem .6rem}
+  .copybtn:hover{border-color:var(--accent); color:var(--accent)}
+</style>
+<script>
+  function printPage(){ window.print(); }
+  async function copyCode(codeId, btnId){
+    const el = document.getElementById(codeId);
+    const txt = el.innerText;
+    try{
+      await navigator.clipboard.writeText(txt);
+      if(btnId){
+        const b = document.getElementById(btnId);
+        const old = b.textContent; b.textContent = 'Copied ✔';
+        setTimeout(()=> b.textContent = old, 1200);
+      }
+    }catch(e){
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      document.execCommand('copy'); s.removeAllRanges();
+      if(btnId) alert('Code copied.');
+    }
+  }
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HEADER -->
+    <header>
+      <div class="header-top">
+        <div class="title">
+          <span class="badge">University of Szeged</span>
+          <h1>Tutorial: Probability with NDVI (Step 3)</h1>
+        </div>
+        <div class="logo-row" aria-label="Department and University logos">
+          <span class="logo-chip logo-dept" title="Department logo">
+            <img src="https://geosci.u-szeged.hu/site/upload/2024/10/logo_v2_2_64x55.png" alt="Department of Atmospheric and Geospatial Data Science logo" />
+          </span>
+          <span class="logo-chip logo-szte" title="SZTE logo">
+            <img src="https://u-szeged.hu/site/design3/img/szte_logo_en.jpg" alt="University of Szeged logo (English)" />
+          </span>
+        </div>
+      </div>
+      <h2>Department of Atmospheric and Geospatial Data Science</h2>
+    </header>
+
+    <!-- OVERVIEW -->
+    <section class="card" aria-labelledby="overview">
+      <div class="bar">
+        <div>
+          <span id="overview" class="subtitle">Overview</span>
+          <div class="hint">Make probability summaries and plots from your NDVI raster.</div>
+        </div>
+        <div><button class="btn" onclick="printPage()">Print</button></div>
+      </div>
+      <div class="section-pad">
+        <p><strong>Input:</strong><br/><span class="sym">/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif</span></p>
+        <p><strong>Prior outputs (from Step 2):</strong><br/>
+          <span class="sym">outputs/task02_hist.png</span>,
+          <span class="sym">task02_quicklook.png</span>,
+          <span class="sym">task02_summary.csv</span>,
+          <span class="sym">task02_summary.json</span>
+        </p>
+        <div class="call">
+          <strong>What you’ll produce (Step 3):</strong>
+          <ul>
+            <li>CSVs: <span class="sym">outputs/task03_p_events.csv</span>, <span class="sym">outputs/task03_p_events_by_region.csv</span>, <span class="sym">outputs/task03_running_mean_samples.csv</span></li>
+            <li>Plots: <span class="sym">outputs/task03_event_prob_plot.png</span>, <span class="sym">outputs/task03_region_bar.png</span>, <span class="sym">outputs/task03_running_mean.png</span></li>
+            <li>(Optional) Report: <span class="sym">reports/task03_report.md</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENDA -->
+    <section class="card" aria-labelledby="agenda">
+      <div class="bar">
+        <div>
+          <span id="agenda" class="subtitle">Agenda (30–40 min)</span>
+          <div class="hint">Follow these checkpoints to complete Step 3.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ol>
+          <li>Run the script (5 min)</li>
+          <li>Interpret event probabilities (8–10 min)</li>
+          <li>Compare conditional probabilities by sub‑region (8–10 min)</li>
+          <li>Examine the LLN running mean (8–10 min)</li>
+          <li>(Optional) Fill the short report template (5 min)</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- STEP 1 -->
+    <section class="card" aria-labelledby="run">
+      <div class="bar">
+        <div>
+          <span id="run" class="subtitle">1) Run the script (about 5 min)</span>
+          <div class="hint">Save the script, install packages, and execute.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <p>Save the script below as <span class="sym">code/task03_probability.py</span>. Then run:</p>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copyA" class="copybtn" onclick="copyCode('blockA','copyA')">Copy code</button>
+        </div>
+        <pre id="blockA">pip install rasterio matplotlib pandas numpy
+python code/task03_probability.py
+</pre>
+      </div>
+      <div class="section-pad small">
+        You should see console summaries and new files inside <span class="sym">outputs/</span>.
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="card" aria-labelledby="events">
+      <div class="bar">
+        <div>
+          <span id="events" class="subtitle">2) Event probabilities — Meaningful questions (8–10 min)</span>
+          <div class="hint">Open the CSV and plot; answer briefly.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <p>Open <span class="sym">outputs/task03_p_events.csv</span> and <span class="sym">outputs/task03_event_prob_plot.png</span>.</p>
+        <ul>
+          <li><strong>Q1.</strong> For thresholds <span class="sym">t ∈ {0.20, 0.30, 0.40, 0.50, 0.60}</span>, how does <span class="sym">P(NDVI ≥ t)</span> change? Which <span class="sym">t</span> best separates “green” areas and why?</li>
+          <li><strong>Q2.</strong> Identify a “knee” in the curve. What does it suggest about dominant land cover or seasonality?</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="card" aria-labelledby="conds">
+      <div class="bar">
+        <div>
+          <span id="conds" class="subtitle">3) Conditional probabilities by sub‑region (8–10 min)</span>
+          <div class="hint">We use simple halves: Top/Bottom/Left/Right (no shapefiles needed).</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <p>Open <span class="sym">outputs/task03_p_events_by_region.csv</span> and <span class="sym">outputs/task03_region_bar.png</span>.</p>
+        <ul>
+          <li><strong>Q3.</strong> For your chosen threshold (e.g., <span class="sym">t=0.5</span>), which half shows higher <span class="sym">P(NDVI ≥ t)</span>? Why (land cover, topo, moisture)?</li>
+          <li><strong>Q4.</strong> Do two halves look similar? If yes, what implies spatial homogeneity? If not, what factors could explain the difference?</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="card" aria-labelledby="lln">
+      <div class="bar">
+        <div>
+          <span id="lln" class="subtitle">4) LLN: Running mean of NDVI (8–10 min)</span>
+          <div class="hint">Observe convergence and confidence band tightening.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <p>Open <span class="sym">outputs/task03_running_mean.png</span> and <span class="sym">outputs/task03_running_mean_samples.csv</span>.</p>
+        <ul>
+          <li><strong>Q5.</strong> How does the running mean behave as <span class="sym">n</span> increases? Does it settle?</li>
+          <li><strong>Q6.</strong> The shaded band (~95% CI) narrows with larger <span class="sym">n</span>. Explain why (CLT). What does this say about uncertainty in the mean estimate?</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- STEP 5 -->
+    <section class="card" aria-labelledby="report">
+      <div class="bar">
+        <div>
+          <span id="report" class="subtitle">5) (Optional) Short report template (5 min)</span>
+          <div class="hint">Save as <span class="sym">reports/task03_report.md</span>.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Markdown template</span>
+          <button id="copyB" class="copybtn" onclick="copyCode('blockB','copyB')">Copy code</button>
+        </div>
+        <pre id="blockB"># Task 3 — Probability with NDVI (Intro)
+
+## Event probabilities
+- Observations from `task03_p_events.csv`:
+- Notable “knee” and interpretation:
+
+## Conditional probabilities
+- Region with highest P(NDVI ≥ t=__):
+- Spatial interpretation (land cover / topo / moisture):
+
+## Running mean (LLN)
+- Behavior as n increases:
+- What the narrowing CI implies:
+
+## Takeaways
+- Threshold choice:
+- Hints for next steps (e.g., masks, seasons, ROIs):
+</pre>
+      </div>
+    </section>
+
+    <!-- SCRIPT -->
+    <section class="card" aria-labelledby="script">
+      <div class="bar">
+        <div>
+          <span id="script" class="subtitle">Python script (save as <span class="sym">code/task03_probability.py</span>)</span>
+          <div class="hint">Uses: numpy, pandas, matplotlib, rasterio. Writes all outputs listed above.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Python</span>
+          <button id="copyC" class="copybtn" onclick="copyCode('blockC','copyC')">Copy code</button>
+        </div>
+        <pre id="blockC">import os, json, math
+import numpy as np
+import pandas as pd
+import rasterio as rio
+import matplotlib.pyplot as plt
+
+# ----------------------------
+# CONFIG
+# ----------------------------
+TIF_PATH = "/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif"
+OUT_DIR  = "/workspaces/geostatistics_masters/outputs"
+REPORTS  = "/workspaces/geostatistics_masters/reports"
+os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(REPORTS, exist_ok=True)
+
+# Thresholds to test for P(NDVI >= t)
+THRESHOLDS = [0.20, 0.30, 0.40, 0.50, 0.60]
+
+# Running mean (LLN) config
+RANDOM_SEED = 42
+RUN_SAMPLES = 50000        # total random draws (adjust if you need faster run)
+CI_Z = 1.96                # ~95% CI
+
+# ----------------------------
+# LOAD NDVI
+# ----------------------------
+assert os.path.exists(TIF_PATH), f"File not found: {TIF_PATH}"
+with rio.open(TIF_PATH) as src:
+    profile = src.profile.copy()
+    ndvi = src.read(1).astype("float32")
+    nodata = src.nodata
+
+if nodata is not None:
+    ndvi = np.where(ndvi == nodata, np.nan, ndvi)
+
+valid_mask = np.isfinite(ndvi)
+vals = ndvi[valid_mask]
+assert vals.size > 0, "No valid NDVI pixels found."
+
+# ----------------------------
+# 1) EVENT PROBABILITIES  P(NDVI >= t)
+# ----------------------------
+records = []
+total = vals.size
+for t in THRESHOLDS:
+    p = float((vals >= t).sum() / total)
+    records.append({"threshold": t, "p_ge_t": p})
+
+df_p = pd.DataFrame(records)
+df_p.to_csv(os.path.join(OUT_DIR, "task03_p_events.csv"), index=False)
+
+# Plot event probability curve
+plt.figure()
+plt.plot(df_p["threshold"], df_p["p_ge_t"], marker="o")
+plt.title("Event Probability: P(NDVI ≥ t)")
+plt.xlabel("Threshold t")
+plt.ylabel("Probability")
+plt.grid(True, alpha=0.3)
+plt.ylim(0, 1)
+plt.savefig(os.path.join(OUT_DIR, "task03_event_prob_plot.png"), dpi=150, bbox_inches="tight")
+plt.close()
+
+# ----------------------------
+# 2) CONDITIONAL PROBABILITIES by simple regions
+# ----------------------------
+h, w = ndvi.shape
+half_h = h // 2
+half_w = w // 2
+
+regions = {
+    "TopHalf":    (slice(0, half_h), slice(0, w)),
+    "BottomHalf": (slice(half_h, h), slice(0, w)),
+    "LeftHalf":   (slice(0, h), slice(0, half_w)),
+    "RightHalf":  (slice(0, h), slice(half_w, w)),
+}
+
+cond_records = []
+t_ref = 0.50  # reference threshold for conditional comparison (adjust if needed)
+for name, (rs, cs) in regions.items():
+    sub = ndvi[rs, cs]
+    sub_valid = np.isfinite(sub)
+    sub_vals = sub[sub_valid]
+    if sub_vals.size == 0:
+        p_sub = np.nan
+        count_valid = 0
+    else:
+        p_sub = float((sub_vals >= t_ref).sum() / sub_vals.size)
+        count_valid = int(sub_vals.size)
+    cond_records.append({
+        "region": name,
+        "threshold": t_ref,
+        "p_ge_t": p_sub,
+        "valid_count": count_valid
+    })
+
+df_cond = pd.DataFrame(cond_records)
+df_cond.to_csv(os.path.join(OUT_DIR, "task03_p_events_by_region.csv"), index=False)
+
+# Bar chart of conditional probabilities
+plt.figure()
+plt.bar(df_cond["region"], df_cond["p_ge_t"])
+plt.title(f"Conditional Probability by Region — P(NDVI ≥ {t_ref})")
+plt.xlabel("Region")
+plt.ylabel("Probability")
+plt.ylim(0, 1)
+for i, v in enumerate(df_cond["p_ge_t"].values):
+    if np.isfinite(v):
+        plt.text(i, v + 0.02, f"{v:.2f}", ha="center", va="bottom")
+plt.savefig(os.path.join(OUT_DIR, "task03_region_bar.png"), dpi=150, bbox_inches="tight")
+plt.close()
+
+# ----------------------------
+# 3) LAW OF LARGE NUMBERS — RUNNING MEAN
+# ----------------------------
+rng = np.random.default_rng(RANDOM_SEED)
+# random indices into the 1D valid array
+idxs = rng.integers(low=0, high=total, size=RUN_SAMPLES)
+samples = vals[idxs]
+
+running_mean = np.empty(RUN_SAMPLES, dtype="float64")
+running_std = np.empty(RUN_SAMPLES, dtype="float64")  # sample std so far
+sum_x = 0.0
+sum_x2 = 0.0
+
+for i in range(RUN_SAMPLES):
+    x = float(samples[i])
+    sum_x += x
+    sum_x2 += x * x
+    n = i + 1
+    mean_i = sum_x / n
+    # sample variance with Bessel's correction when n>1
+    if n > 1:
+        var_i = (sum_x2 - n * mean_i * mean_i) / (n - 1)
+        std_i = math.sqrt(var_i) if var_i > 0 else 0.0
+    else:
+        std_i = 0.0
+    running_mean[i] = mean_i
+    running_std[i] = std_i
+
+# Approximate 95% CI using current sample std / sqrt(n)
+n_vals = np.arange(1, RUN_SAMPLES + 1)
+ci_halfwidth = CI_Z * running_std / np.sqrt(n_vals)
+lower = running_mean - ci_halfwidth
+upper = running_mean + ci_halfwidth
+
+# Save samples/means for inspection
+df_rm = pd.DataFrame({
+    "n": n_vals,
+    "sample": samples,
+    "running_mean": running_mean,
+    "running_std": running_std,
+    "ci_lower": lower,
+    "ci_upper": upper
+})
+df_rm.to_csv(os.path.join(OUT_DIR, "task03_running_mean_samples.csv"), index=False)
+
+# Plot running mean and CI
+plt.figure(figsize=(8.5, 5))
+plt.plot(n_vals, running_mean, lw=1.2, label="Running mean")
+plt.fill_between(n_vals, lower, upper, alpha=0.2, label="~95% CI")
+plt.xlabel("Sample size (n)")
+plt.ylabel("NDVI mean estimate")
+plt.title("Law of Large Numbers — Running Mean of NDVI")
+plt.xscale("log")  # log scale shows early convergence clearly
+plt.grid(True, which="both", ls="--", alpha=0.3)
+plt.legend()
+plt.savefig(os.path.join(OUT_DIR, "task03_running_mean.png"), dpi=150, bbox_inches="tight")
+plt.close()
+
+# ----------------------------
+# CONSOLE SUMMARY
+# ----------------------------
+print("\n=== TASK 3 SUMMARY ===")
+print(f"Total valid NDVI pixels: {total}")
+print("\nEvent probabilities P(NDVI ≥ t):")
+print(df_p.to_string(index=False))
+print(f"\nConditional probabilities by region (t={t_ref}):")
+print(df_cond.to_string(index=False))
+print("\nOutputs written:")
+print(f" - {os.path.join(OUT_DIR, 'task03_p_events.csv')}")
+print(f" - {os.path.join(OUT_DIR, 'task03_event_prob_plot.png')}")
+print(f" - {os.path.join(OUT_DIR, 'task03_p_events_by_region.csv')}")
+print(f" - {os.path.join(OUT_DIR, 'task03_region_bar.png')}")
+print(f" - {os.path.join(OUT_DIR, 'task03_running_mean_samples.csv')}")
+print(f" - {os.path.join(OUT_DIR, 'task03_running_mean.png')}")
+</pre>
+      </div>
+    </section>
+
+    <!-- TIPS -->
+    <section class="card" aria-labelledby="tips">
+      <div class="bar">
+        <div>
+          <span id="tips" class="subtitle">Tips (if students are curious)</span>
+          <div class="hint">Quick variations and expectations.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li>If your Step‑2 NDVI histogram looked <em>bimodal</em>, expect a steeper drop in <span class="sym">P(NDVI ≥ t)</span> near the valley between modes.</li>
+          <li>Change <span class="sym">t_ref</span> in the script (e.g., 0.4 or 0.6) and re‑run to see how regional rankings change.</li>
+          <li>If performance is slow, reduce <span class="sym">RUN_SAMPLES</span> (e.g., to 20,000).</li>
+          <li>Follow‑up idea: add geometrical probability (areal fraction per grid) and fuzzy membership functions.</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
