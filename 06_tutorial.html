@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Task 5 — Random Variables, CDF/PDF (NDVI) — University of Szeged</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --accent:#2563eb; --accent-2:#38bdf8; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --shade:rgba(2,6,23,.06); --info:#0ea5e9; --good:#16a34a; --warn:#f59e0b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
+      --accent:#60a5fa; --accent-2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
+      --shade:rgba(255,255,255,.06); --info:#38bdf8; --good:#22c55e; --warn:#fbbf24;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  }
+  .wrap{max-width:1100px; margin-inline:auto}
+
+  /* HEADER */
+  header{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:.25rem .5rem; border-radius:999px}
+  h1{margin:0; font-size:1.35rem; font-weight:700}
+  h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
+  .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .logo-chip{display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.35rem .5rem; box-shadow:var(--shadow)}
+  .logo-chip img{display:block; height:42px; width:auto; object-fit:contain}
+  .logo-chip.logo-dept img{height:55px}
+  .logo-chip.logo-szte img{height:42px}
+
+  /* CARDS */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; margin-top:1rem; box-shadow:var(--shadow); overflow:hidden}
+  .bar{padding:.9rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .subtitle{font-weight:600}
+  .hint{color:var(--muted); font-size:.92rem}
+  .btn{border:1px solid var(--border); background:transparent; color:var(--ink); padding:.45rem .7rem; border-radius:10px; cursor:pointer; font-weight:600}
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .call{border-left:4px solid var(--info); background:rgba(14,165,233,.08); padding:.7rem .9rem; border-radius:10px}
+  .section-pad{padding:1rem}
+  ul,ol{margin:0; padding-left:1.2rem}
+  .small{font-size:.95rem; color:var(--muted)}
+  .sym, code, kbd, pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+
+  /* CODE BLOCKS */
+  .codewrap{position:relative}
+  pre{
+    margin:0; padding:1rem; overflow:auto; background:#0b1020; color:#e6ebf5;
+    line-height:1.4; font-size:.95rem; border-top:1px solid var(--border);
+  }
+  .copybar{
+    display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+    padding:.6rem .75rem; border-bottom:1px solid var(--border); background:var(--card);
+  }
+  .copybtn{border:1px solid var(--border); border-radius:8px; background:transparent; cursor:pointer; font-weight:700; padding:.35rem .6rem}
+  .copybtn:hover{border-color:var(--accent); color:var(--accent)}
+</style>
+<script>
+  function printPage(){ window.print(); }
+  async function copyCode(codeId, btnId){
+    const el = document.getElementById(codeId);
+    const txt = el.innerText;
+    try{
+      await navigator.clipboard.writeText(txt);
+      if(btnId){
+        const b = document.getElementById(btnId);
+        const old = b.textContent; b.textContent = 'Copied ✔';
+        setTimeout(()=> b.textContent = old, 1200);
+      }
+    }catch(e){
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      document.execCommand('copy'); s.removeAllRanges();
+      if(btnId) alert('Code copied.');
+    }
+  }
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HEADER -->
+    <header>
+      <div class="header-top">
+        <div class="title">
+          <span class="badge">University of Szeged</span>
+          <h1>Task 5 — Random Variables, CDF/PDF (≈30–40 min)</h1>
+        </div>
+        <div class="logo-row" aria-label="Department and University logos">
+          <span class="logo-chip logo-dept" title="Department logo">
+            <img src="https://geosci.u-szeged.hu/site/upload/2024/10/logo_v2_2_64x55.png" alt="Department of Atmospheric and Geospatial Data Science logo" />
+          </span>
+          <span class="logo-chip logo-szte" title="SZTE logo">
+            <img src="https://u-szeged.hu/site/design3/img/szte_logo_en.jpg" alt="University of Szeged logo (English)" />
+          </span>
+        </div>
+      </div>
+      <h2>Department of Atmospheric and Geospatial Data Science</h2>
+    </header>
+
+    <!-- OVERVIEW -->
+    <section class="card" aria-labelledby="overview">
+      <div class="bar">
+        <div>
+          <span id="overview" class="subtitle">Overview</span>
+          <div class="hint">Empirical CDF/PDF of NDVI and a North–South comparison.</div>
+        </div>
+        <div><button class="btn" onclick="printPage()">Print</button></div>
+      </div>
+      <div class="section-pad">
+        <p><strong>Input:</strong><br/><span class="sym">/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif</span></p>
+        <div class="call">
+          <strong>You will produce:</strong>
+          <ul>
+            <li><strong>Code:</strong> <span class="sym">code/task05_cdf_pdf.py</span></li>
+            <li><strong>Figures:</strong>
+              <span class="sym">outputs/task05_cdf.png</span>,
+              <span class="sym">outputs/task05_pdf.png</span>,
+              <span class="sym">outputs/task05_region_compare.png</span>
+            </li>
+            <li><strong>Report:</strong> <span class="sym">reports/task05_report.md</span> (or PDF)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENDA -->
+    <section class="card" aria-labelledby="agenda">
+      <div class="bar">
+        <div>
+          <span id="agenda" class="subtitle">Agenda & Steps</span>
+          <div class="hint">Follow these checkpoints to complete Task 5.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ol>
+          <li><strong>0) Setup (1 min)</strong></li>
+          <li><strong>1) Run the script (5 min)</strong></li>
+          <li><strong>2) Interpret the overall CDF (8–10 min)</strong></li>
+          <li><strong>3) Interpret the overall PDF (8–10 min)</strong></li>
+          <li><strong>4) Region comparison: North vs South (8–10 min)</strong></li>
+          <li><strong>5) Write your short report (5–7 min)</strong></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 0) SETUP -->
+    <section class="card" aria-labelledby="setup">
+      <div class="bar">
+        <div>
+          <span id="setup" class="subtitle">0) Setup (1 min)</span>
+          <div class="hint">Install packages (SciPy optional for KDE).</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copy0" class="copybtn" onclick="copyCode('block0','copy0')">Copy</button>
+        </div>
+        <pre id="block0">pip install rasterio numpy pandas matplotlib
+# Optional (for smooth KDE curve; script falls back gracefully if missing)
+pip install scipy
+</pre>
+      </div>
+    </section>
+
+    <!-- 1) RUN -->
+    <section class="card" aria-labelledby="run">
+      <div class="bar">
+        <div>
+          <span id="run" class="subtitle">1) Run the script (5 min)</span>
+          <div class="hint">Save then execute the Python file.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <p>Save the script below as <span class="sym">code/task05_cdf_pdf.py</span>, then run:</p>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copy1" class="copybtn" onclick="copyCode('block1','copy1')">Copy</button>
+        </div>
+        <pre id="block1">python code/task05_cdf_pdf.py
+</pre>
+      </div>
+      <div class="section-pad small">
+        This computes the empirical CDF, a PDF estimate (histogram and optional KDE), and a North vs South comparison (TopHalf vs BottomHalf).
+      </div>
+    </section>
+
+    <!-- 2) INTERPRET CDF -->
+    <section class="card" aria-labelledby="cdf">
+      <div class="bar">
+        <div>
+          <span id="cdf" class="subtitle">2) Interpret the overall CDF (8–10 min)</span>
+          <div class="hint">Open <span class="sym">outputs/task05_cdf.png</span>.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li>Note quartiles (Q1, median, Q3) and the mean marker.</li>
+          <li>The CDF is cumulative: for any NDVI value <span class="sym">x</span>, <span class="sym">F(x) = P(NDVI ≤ x)</span>.
+              Lower CDF values at a given <span class="sym">x</span> mean more mass to the right (greener).</li>
+        </ul>
+        <p><strong>Answer (for your report):</strong></p>
+        <ul>
+          <li>Where is the median? Does it match expectations for your ROI/season?</li>
+          <li>Are there long tails (much area at very low or very high NDVI)?</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3) INTERPRET PDF -->
+    <section class="card" aria-labelledby="pdf">
+      <div class="bar">
+        <div>
+          <span id="pdf" class="subtitle">3) Interpret the overall PDF (8–10 min)</span>
+          <div class="hint">Open <span class="sym">outputs/task05_pdf.png</span>.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li>The PDF shows the density (shape) of NDVI values.</li>
+          <li>We use a histogram with a Freedman–Diaconis bin width; if SciPy is available, a KDE curve is also plotted.</li>
+        </ul>
+        <p><strong>Answer:</strong></p>
+        <ul>
+          <li>Is the distribution unimodal or bimodal (mixed land cover)?</li>
+          <li>Do you see a shoulder around common thresholds (e.g., 0.3–0.4 or 0.5–0.6)?</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4) REGION COMPARE -->
+    <section class="card" aria-labelledby="region">
+      <div class="bar">
+        <div>
+          <span id="region" class="subtitle">4) Region comparison: North vs South (8–10 min)</span>
+          <div class="hint">Open <span class="sym">outputs/task05_region_compare.png</span> (CDFs & PDFs overlaid).</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li>Which region appears greener (i.e., stochastically larger NDVI)?<br/>
+              <span class="small">Hint: if the North CDF lies mostly below the South CDF, North tends to have higher NDVI.</span></li>
+          <li>Do PDFs agree with the CDF story? If they differ, why might that be?</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5) REPORT TEMPLATE -->
+    <section class="card" aria-labelledby="report">
+      <div class="bar">
+        <div>
+          <span id="report" class="subtitle">5) Write your short report (5–7 min)</span>
+          <div class="hint">Create <span class="sym">reports/task05_report.md</span> and paste this template.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Markdown template</span>
+          <button id="copyT" class="copybtn" onclick="copyCode('blockT','copyT')">Copy</button>
+        </div>
+        <pre id="blockT"># Task 5 — Random Variables, CDF/PDF
+
+## CDF vs PDF — how they complement each other
+- CDF (cumulative proportion ≤ x) helped me see ______.
+- PDF (shape/density) revealed ______ that the CDF alone didn’t.
+
+## Overall distribution (whole ROI)
+- Median NDVI: ____
+- Notable features (tails, modes): ____
+
+## Region comparison (North vs South)
+- Which region is greener (stochastically larger)? Why?
+- CDF evidence:
+- PDF evidence:
+- Possible geographic/land-cover explanations:
+
+## Notes on binning/KDE
+- Freedman–Diaconis bins explained:
+- KDE present? (yes/no) How did it help?
+
+## Takeaways
+- Practical thresholds to consider:
+- Any caveats or data quality concerns:
+</pre>
+      </div>
+    </section>
+
+    <!-- SCRIPT -->
+    <section class="card" aria-labelledby="script">
+      <div class="bar">
+        <div>
+          <span id="script" class="subtitle">The script — <span class="sym">code/task05_cdf_pdf.py</span> (ready to run)</span>
+          <div class="hint">Uses: rasterio, numpy, pandas, matplotlib; optional SciPy for KDE.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Python</span>
+          <button id="copyPY" class="copybtn" onclick="copyCode('blockPY','copyPY')">Copy</button>
+        </div>
+        <pre id="blockPY">import os, math
+import numpy as np
+import pandas as pd
+import rasterio as rio
+import matplotlib.pyplot as plt
+
+# Optional KDE (handled gracefully if SciPy is absent)
+try:
+    from scipy.stats import gaussian_kde
+    HAVE_SCIPY = True
+except Exception:
+    HAVE_SCIPY = False
+
+# ----------------------------
+# CONFIG
+# ----------------------------
+TIF_PATH = "/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif"
+OUT_DIR  = "/workspaces/geostatistics_masters/outputs"
+REPORTS  = "/workspaces/geostatistics_masters/reports"
+os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(REPORTS, exist_ok=True)
+
+# Freedman–Diaconis safeguards
+MIN_BINS = 20
+MAX_BINS = 200
+
+# ----------------------------
+# Helpers
+# ----------------------------
+def load_ndvi(path):
+    assert os.path.exists(path), f"File not found: {path}"
+    with rio.open(path) as src:
+        arr = src.read(1).astype("float32")
+        nodata = src.nodata
+    if nodata is not None:
+        arr = np.where(arr == nodata, np.nan, arr)
+    vals = arr[np.isfinite(arr)]
+    return arr, vals
+
+def empirical_cdf(values):
+    """Return sorted x and cumulative y (1..n)/n."""
+    x = np.sort(values)
+    n = x.size
+    y = np.arange(1, n + 1) / n
+    return x, y
+
+def freedman_diaconis_bins(values, min_bins=MIN_BINS, max_bins=MAX_BINS):
+    """Compute #bins via Freedman–Diaconis; clamp to [min,max]."""
+    q75, q25 = np.percentile(values, [75, 25])
+    iqr = max(q75 - q25, 1e-9)
+    n = values.size
+    h = 2.0 * iqr / (n ** (1.0 / 3.0))
+    data_range = values.max() - values.min()
+    if h <= 0 or not np.isfinite(h) or data_range <= 0:
+        bins = 60
+    else:
+        bins = int(math.ceil(data_range / h))
+    return int(np.clip(bins, min_bins, max_bins))
+
+def region_split_top_bottom(arr):
+    """Returns values for North (top half) and South (bottom half)."""
+    h, w = arr.shape
+    half = h // 2
+    top = arr[:half, :]
+    bot = arr[half:, :]
+    top_vals = top[np.isfinite(top)]
+    bot_vals = bot[np.isfinite(bot)]
+    return top_vals, bot_vals
+
+# ----------------------------
+# Load data
+# ----------------------------
+ndvi, vals = load_ndvi(TIF_PATH)
+assert vals.size > 0, "No valid NDVI pixels found."
+
+# Basic summary for console & (optional) CSV
+summary = {
+    "count": int(vals.size),
+    "min": float(np.min(vals)),
+    "q05": float(np.percentile(vals, 5)),
+    "q25": float(np.percentile(vals, 25)),
+    "median": float(np.median(vals)),
+    "mean": float(np.mean(vals)),
+    "q75": float(np.percentile(vals, 75)),
+    "q95": float(np.percentile(vals, 95)),
+    "max": float(np.max(vals)),
+    "std": float(np.std(vals)),
+}
+pd.DataFrame([summary]).to_csv(os.path.join(OUT_DIR, "task05_stats_overall.csv"), index=False)
+
+# ----------------------------
+# 1) Empirical CDF (overall)
+# ----------------------------
+x, y = empirical_cdf(vals)
+q25, med, q75 = np.percentile(vals, [25, 50, 75])
+mu = np.mean(vals)
+
+plt.figure(figsize=(7.5, 5))
+plt.plot(x, y, lw=1.4, label="Empirical CDF")
+# annotate quartiles and mean
+for v, lbl in [(q25,"Q1"), (med,"Median"), (q75,"Q3"), (mu,"Mean")]:
+    plt.axvline(v, ls="--", lw=0.9)
+    plt.text(v, 0.02, lbl, rotation=90, va="bottom", ha="right")
+
+plt.xlabel("NDVI")
+plt.ylabel("F(x) = P(NDVI ≤ x)")
+plt.title("Empirical CDF — NDVI (whole ROI)")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig(os.path.join(OUT_DIR, "task05_cdf.png"), dpi=150)
+plt.close()
+
+# ----------------------------
+# 2) PDF estimate (overall)
+# ----------------------------
+bins = freedman_diaconis_bins(vals)
+hist_y, hist_edges = np.histogram(vals, bins=bins, density=True)
+hist_x = 0.5 * (hist_edges[:-1] + hist_edges[1:])
+
+plt.figure(figsize=(7.5, 5))
+plt.step(hist_x, hist_y, where="mid", label=f"Histogram PDF (FD bins ~{bins})")
+
+# Optional KDE
+if HAVE_SCIPY and vals.size >= 1000:
+    kde = gaussian_kde(vals)
+    x_grid = np.linspace(vals.min(), vals.max(), 512)
+    pdf_kde = kde.evaluate(x_grid)
+    plt.plot(x_grid, pdf_kde, lw=1.2, label="KDE (Gaussian)")
+
+plt.xlabel("NDVI")
+plt.ylabel("Density (PDF)")
+plt.title("NDVI PDF — Histogram (and KDE if available)")
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.savefig(os.path.join(OUT_DIR, "task05_pdf.png"), dpi=150)
+plt.close()
+
+# ----------------------------
+# 3) North vs South comparison (TopHalf vs BottomHalf)
+# ----------------------------
+north_vals, south_vals = region_split_top_bottom(ndvi)
+
+# CDFs
+nx, ny = empirical_cdf(north_vals) if north_vals.size else (np.array([]), np.array([]))
+sx, sy = empirical_cdf(south_vals) if south_vals.size else (np.array([]), np.array([]))
+
+# PDFs with common bins (for fair comparison)
+all_min = np.nanmin([north_vals.min(), south_vals.min()])
+all_max = np.nanmax([north_vals.max(), south_vals.max()])
+both = np.concatenate([north_vals, south_vals])
+cbins = freedman_diaconis_bins(both)
+edges = np.linspace(all_min, all_max, cbins + 1)
+nx_pdf, _ = np.histogram(north_vals, bins=edges, density=True)
+sx_pdf, _ = np.histogram(south_vals, bins=edges, density=True)
+centers = 0.5 * (edges[:-1] + edges[1:])
+
+fig = plt.figure(figsize=(11, 4.8))
+
+# Left: CDF overlay
+ax1 = fig.add_subplot(1, 2, 1)
+if nx.size:
+    ax1.plot(nx, ny, lw=1.2, label="North (TopHalf)")
+if sx.size:
+    ax1.plot(sx, sy, lw=1.2, label="South (BottomHalf)")
+ax1.set_xlabel("NDVI")
+ax1.set_ylabel("F(x)")
+ax1.set_title("CDF — North vs South")
+ax1.grid(True, alpha=0.3)
+ax1.legend()
+
+# Right: PDF overlay
+ax2 = fig.add_subplot(1, 2, 2)
+ax2.step(centers, nx_pdf, where="mid", label=f"North PDF (bins {cbins})")
+ax2.step(centers, sx_pdf, where="mid", label=f"South PDF (bins {cbins})")
+
+# Optional KDE overlay per region
+if HAVE_SCIPY and north_vals.size >= 500:
+    grid = np.linspace(all_min, all_max, 512)
+    ax2.plot(grid, gaussian_kde(north_vals).evaluate(grid), lw=1.1, label="North KDE")
+if HAVE_SCIPY and south_vals.size >= 500:
+    grid = np.linspace(all_min, all_max, 512)
+    ax2.plot(grid, gaussian_kde(south_vals).evaluate(grid), lw=1.1, label="South KDE")
+
+ax2.set_xlabel("NDVI")
+ax2.set_ylabel("Density")
+ax2.set_title("PDF — North vs South")
+ax2.grid(True, alpha=0.3)
+ax2.legend()
+
+plt.tight_layout()
+plt.savefig(os.path.join(OUT_DIR, "task05_region_compare.png"), dpi=150)
+plt.close()
+
+# ----------------------------
+# Console summary + optional CSVs
+# ----------------------------
+def stats_for(vals):
+    return dict(
+        count=int(vals.size),
+        min=float(np.min(vals)),
+        q25=float(np.percentile(vals,25)),
+        median=float(np.median(vals)),
+        mean=float(np.mean(vals)),
+        q75=float(np.percentile(vals,75)),
+        max=float(np.max(vals)),
+        std=float(np.std(vals))
+    )
+
+north_stats = stats_for(north_vals)
+south_stats = stats_for(south_vals)
+pd.DataFrame([north_stats]).to_csv(os.path.join(OUT_DIR, "task05_stats_north.csv"), index=False)
+pd.DataFrame([south_stats]).to_csv(os.path.join(OUT_DIR, "task05_stats_south.csv"), index=False)
+
+print("\n=== TASK 5 SUMMARY ===")
+print("Overall:", summary)
+print("North stats:", north_stats)
+print("South stats:", south_stats)
+print("\nWrote:")
+print(f" - {os.path.join(OUT_DIR,'task05_cdf.png')}")
+print(f" - {os.path.join(OUT_DIR,'task05_pdf.png')}")
+print(f" - {os.path.join(OUT_DIR,'task05_region_compare.png')}")
+print(f" - {os.path.join(OUT_DIR,'task05_stats_overall.csv')}")
+print(f" - {os.path.join(OUT_DIR,'task05_stats_north.csv')}")
+print(f" - {os.path.join(OUT_DIR,'task05_stats_south.csv')}")
+print("\nNote: KDE curves included only if SciPy is installed.")
+</pre>
+      </div>
+    </section>
+
+    <!-- FINAL PROMPT -->
+    <section class="card" aria-labelledby="prompt">
+      <div class="bar">
+        <div>
+          <span id="prompt" class="subtitle">Final‑report prompt (paste into your report)</span>
+          <div class="hint">Use these guiding questions to conclude.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Prompt</span>
+          <button id="copyFP" class="copybtn" onclick="copyCode('blockFP','copyFP')">Copy</button>
+        </div>
+        <pre id="blockFP">How do CDF and PDF complement each other for NDVI?
+
+CDF shows cumulative prevalence (e.g., “What % of area has NDVI ≤ x?”).
+PDF reveals shape/modes/peaks that the CDF smooths over.
+
+Which region appears greener (stochastically larger NDVI) — North or South?
+Support with:
+- CDF evidence (one curve mostly below the other across x → greener).
+- PDF evidence (more mass at higher NDVI).
+
+Binning/KDE: Why Freedman–Diaconis? Did KDE (if present) clarify any features?
+
+(Extension idea: compare Left vs Right, or mask a custom polygon via array slicing.)</pre>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
