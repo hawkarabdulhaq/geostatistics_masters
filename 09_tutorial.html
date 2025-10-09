@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Task 8 — Geoscientific Context & Synthesis — University of Szeged</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --accent:#2563eb; --accent-2:#38bdf8; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --info:#0ea5e9; --warn:#f59e0b; --ok:#16a34a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
+      --accent:#60a5fa; --accent-2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
+      --info:#38bdf8; --warn:#fbbf24; --ok:#22c55e;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  }
+  .wrap{max-width:1100px; margin-inline:auto}
+
+  /* HEADER */
+  header{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:.25rem .5rem; border-radius:999px}
+  h1{margin:0; font-size:1.35rem; font-weight:700}
+  h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
+  .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .logo-chip{display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.35rem .5rem; box-shadow:var(--shadow)}
+  .logo-chip img{display:block; height:42px; width:auto; object-fit:contain}
+  .logo-chip.logo-dept img{height:55px}
+  .logo-chip.logo-szte img{height:42px}
+
+  /* CARDS */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; margin-top:1rem; box-shadow:var(--shadow); overflow:hidden}
+  .bar{padding:.9rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .subtitle{font-weight:600}
+  .hint{color:var(--muted); font-size:.92rem}
+  .btn{border:1px solid var(--border); background:transparent; color:var(--ink); padding:.45rem .7rem; border-radius:10px; cursor:pointer; font-weight:600}
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .call{border-left:4px solid var(--info); background:rgba(14,165,233,.08); padding:.7rem .9rem; border-radius:10px}
+  .warn{border-left:4px solid var(--warn); background:rgba(245,158,11,.10); padding:.7rem .9rem; border-radius:10px}
+  .ok{border-left:4px solid var(--ok); background:rgba(22,163,74,.10); padding:.7rem .9rem; border-radius:10px}
+  .section-pad{padding:1rem}
+  .small{font-size:.95rem; color:var(--muted)}
+  .sym, code, kbd, pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+
+  /* CODE BLOCKS */
+  .codewrap{position:relative}
+  pre{
+    margin:0; padding:1rem; overflow:auto; background:#0b1020; color:#e6ebf5;
+    line-height:1.4; font-size:.95rem; border-top:1px solid var(--border);
+  }
+  .copybar{
+    display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+    padding:.6rem .75rem; border-bottom:1px solid var(--border); background:var(--card);
+  }
+  .copybtn{border:1px solid var(--border); border-radius:8px; background:transparent; cursor:pointer; font-weight:700; padding:.35rem .6rem}
+  .copybtn:hover{border-color:var(--accent); color:var(--accent)}
+  ul,ol{margin:0; padding-left:1.2rem}
+</style>
+<script>
+  function printPage(){ window.print(); }
+  async function copyCode(codeId, btnId){
+    const el = document.getElementById(codeId);
+    const txt = el.innerText;
+    try{
+      await navigator.clipboard.writeText(txt);
+      if(btnId){
+        const b = document.getElementById(btnId);
+        const old = b.textContent; b.textContent = 'Copied ✔';
+        setTimeout(()=> b.textContent = old, 1200);
+      }
+    }catch(e){
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      document.execCommand('copy'); s.removeAllRanges();
+      if(btnId) alert('Code copied.');
+    }
+  }
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HEADER -->
+    <header>
+      <div class="header-top">
+        <div class="title">
+          <span class="badge">University of Szeged</span>
+          <h1>Task 8 — Geoscientific Context & Synthesis (≈40–60 min)</h1>
+        </div>
+        <div class="logo-row" aria-label="Department and University logos">
+          <span class="logo-chip logo-dept" title="Department logo">
+            <img src="https://geosci.u-szeged.hu/site/upload/2024/10/logo_v2_2_64x55.png" alt="Department of Atmospheric and Geospatial Data Science logo" />
+          </span>
+          <span class="logo-chip logo-szte" title="SZTE logo">
+            <img src="https://u-szeged.hu/site/design3/img/szte_logo_en.jpg" alt="University of Szeged logo (English)" />
+          </span>
+        </div>
+      </div>
+      <h2>Department of Atmospheric and Geospatial Data Science</h2>
+    </header>
+
+    <!-- PURPOSE -->
+    <section class="card" aria-labelledby="purpose">
+      <div class="bar">
+        <div>
+          <span id="purpose" class="subtitle">Purpose</span>
+          <div class="hint">Translate probabilistic work into a geoscience narrative for your ROI.</div>
+        </div>
+        <div><button class="btn" onclick="printPage()">Print</button></div>
+      </div>
+      <div class="section-pad">
+        <p>Example questions:</p>
+        <ul>
+          <li>Which areas show robust vegetation likely to resist seasonal drought?</li>
+          <li>Where is land‑degradation risk highest (sparse/unstable greenness)?</li>
+          <li>What NDVI patterns support habitat condition or soil‑moisture proxy mapping?</li>
+        </ul>
+        <div class="call">
+          You’ll combine: <strong>area‑based probabilities</strong> (Task 4), <strong>fuzzy membership</strong> (Task 4),
+          <strong>distributional comparisons</strong> (Tasks 5–6), and <strong>CLT/uncertainty on mean estimates</strong> (Task 7) to justify a recommendation and communicate uncertainty.
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBMIT -->
+    <section class="card" aria-labelledby="submit">
+      <div class="bar">
+        <div>
+          <span id="submit" class="subtitle">What you will submit</span>
+          <div class="hint">Deliverables & structure.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li><strong>Code:</strong> <span class="sym">code/task08_synthesis.py</span> (notebook is fine)</li>
+          <li><strong>Figures:</strong> <span class="sym">outputs/task08_map_pack/*.png</span> (1–3 figures)</li>
+          <li><strong>Final report (4–6 pages):</strong> <span class="sym">reports/task08_report.{md|pdf}</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- TIME PLAN -->
+    <section class="card" aria-labelledby="plan">
+      <div class="bar">
+        <div>
+          <span id="plan" class="subtitle">Time plan (suggested)</span>
+          <div class="hint">A quick checklist to stay on time.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ol>
+          <li><strong>Choose a question (5–10 min)</strong></li>
+          <li><strong>Run the synthesis script to build maps/tables (10–15 min)</strong></li>
+          <li><strong>Interpret outputs and draft bullets (10–15 min)</strong></li>
+          <li><strong>Write the 4–6 page report (15–20 min)</strong></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SYNTHESIS YOU'LL CREATE -->
+    <section class="card" aria-labelledby="synth">
+      <div class="bar">
+        <div>
+          <span id="synth" class="subtitle">The synthesis you’ll create</span>
+          <div class="hint">What the code does & how pieces connect.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li>Loads your NDVI raster (<span class="sym">/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif</span>).</li>
+          <li>Reuses the <strong>geometrical probability</strong> grid and <strong>fuzzy μ<sub>veg</sub></strong> rules (Task 4).</li>
+          <li>Summarizes distribution shape/tails (Task 5–6) and overlays mean‑NDVI uncertainty via CLT (Task 7).</li>
+          <li>Creates a <strong>priority map</strong> by combining crisp area‑fractions and fuzzy means with a transparent score.</li>
+        </ul>
+        <div class="ok"><strong>Tip:</strong> You can tweak grid size, threshold <span class="sym">t</span>, and fuzzy breakpoints directly in the config block.</div>
+      </div>
+    </section>
+
+    <!-- SETUP -->
+    <section class="card" aria-labelledby="setup">
+      <div class="bar">
+        <div>
+          <span id="setup" class="subtitle">0) Setup (1 min)</span>
+          <div class="hint">Install required packages.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copyPip" class="copybtn" onclick="copyCode('pipblk','copyPip')">Copy</button>
+        </div>
+        <pre id="pipblk">pip install rasterio matplotlib pandas numpy
+</pre>
+      </div>
+    </section>
+
+    <!-- RUN -->
+    <section class="card" aria-labelledby="run">
+      <div class="bar">
+        <div>
+          <span id="run" class="subtitle">1) Run the script (4–6 min)</span>
+          <div class="hint">Save, then execute from your repo root.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <p>Save as <span class="sym">code/task08_synthesis.py</span> and run:</p>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copyRun" class="copybtn" onclick="copyCode('runblk','copyRun')">Copy</button>
+        </div>
+        <pre id="runblk">python code/task08_synthesis.py
+</pre>
+      </div>
+      <div class="section-pad small">
+        It creates <span class="sym">outputs/task08_map_pack/</span> with 2–3 PNGs and CSV summaries.
+      </div>
+    </section>
+
+    <!-- SCRIPT -->
+    <section class="card" aria-labelledby="script">
+      <div class="bar">
+        <div>
+          <span id="script" class="subtitle">Python script — <span class="sym">code/task08_synthesis.py</span> (ready to run)</span>
+          <div class="hint">Uses only: NumPy, Pandas, Matplotlib, Rasterio.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Python</span>
+          <button id="copyCode" class="copybtn" onclick="copyCode('codeblk','copyCode')">Copy</button>
+        </div>
+        <pre id="codeblk">import os, math, json
+import numpy as np
+import pandas as pd
+import rasterio as rio
+import matplotlib.pyplot as plt
+
+# ----------------------------
+# CONFIG
+# ----------------------------
+TIF_PATH = "/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif"
+OUT_DIR  = "/workspaces/geostatistics_masters/outputs"
+MAP_DIR  = os.path.join(OUT_DIR, "task08_map_pack")
+os.makedirs(MAP_DIR, exist_ok=True)
+
+# Geometrical probability grid (approx cell size in pixels)
+# If Sentinel-2 at 10 m, 25x25 px ~ 250 m cell
+CELL_PX   = 25                 # grid size (square cells, in pixels)
+T_THRESH  = 0.50               # crisp vegetation threshold for "NDVI >= t"
+# Fuzzy membership μ_veg: 0 at <=A, 1 at >=B, linear between
+FUZZY_A, FUZZY_B = 0.20, 0.70
+
+# CLT sampling for uncertainty on mean NDVI
+RANDOM_SEED = 7
+MEAN_SAMPLE_N = 1000           # total random samples to estimate mean & CI
+CLT_SIZES = [10, 30, 100]      # sample sizes for the sample-mean overlay
+
+# ----------------------------
+# LOAD NDVI
+# ----------------------------
+assert os.path.exists(TIF_PATH), f"Not found: {TIF_PATH}"
+with rio.open(TIF_PATH) as src:
+    ndvi = src.read(1).astype("float32")
+    nodata = src.nodata
+profile = src.profile.copy()
+
+if nodata is not None:
+    ndvi = np.where(ndvi == nodata, np.nan, ndvi)
+
+valid = np.isfinite(ndvi)
+vals  = ndvi[valid]
+assert vals.size > 0, "No valid NDVI pixels."
+
+H, W = ndvi.shape
+
+# ----------------------------
+# GEOMETRICAL PROBABILITY per cell
+# ----------------------------
+def block_iter(h, w, cell):
+    for r0 in range(0, h, cell):
+        for c0 in range(0, w, cell):
+            r1 = min(h, r0 + cell)
+            c1 = min(w, c0 + cell)
+            yield r0, r1, c0, c1
+
+grid_records = []
+geom_map = np.full_like(ndvi, np.nan, dtype="float32")
+
+for r0, r1, c0, c1 in block_iter(H, W, CELL_PX):
+    block = ndvi[r0:r1, c0:c1]
+    m = np.isfinite(block)
+    n_valid = int(m.sum())
+    if n_valid == 0:
+        frac = np.nan
+    else:
+        frac = float((block[m] >= T_THRESH).sum() / n_valid)
+
+    grid_records.append({
+        "r0": r0, "r1": r1, "c0": c0, "c1": c1,
+        "valid": n_valid,
+        "p_ge_t": frac
+    })
+    if n_valid > 0:
+        geom_map[r0:r1, c0:c1] = frac
+
+df_geom = pd.DataFrame(grid_records)
+df_geom.to_csv(os.path.join(OUT_DIR, "task08_geom_cell_probs.csv"), index=False)
+
+# ----------------------------
+# FUZZY MEMBERSHIP map μ_veg
+# ----------------------------
+def mu_veg(x, a=FUZZY_A, b=FUZZY_B):
+    # piecewise linear 0..1
+    return np.where(~np.isfinite(x), np.nan,
+            np.where(x <= a, 0.0,
+            np.where(x >= b, 1.0,
+            (x - a) / max(1e-6, (b - a)) )))
+
+fuzzy_map = mu_veg(ndvi, FUZZY_A, FUZZY_B)
+fuzzy_summary = {
+    "mu_mean": float(np.nanmean(fuzzy_map)),
+    "mu_std": float(np.nanstd(fuzzy_map)),
+    "mu_p05": float(np.nanpercentile(fuzzy_map, 5)),
+    "mu_p50": float(np.nanpercentile(fuzzy_map, 50)),
+    "mu_p95": float(np.nanpercentile(fuzzy_map, 95)),
+}
+pd.DataFrame([fuzzy_summary]).to_csv(os.path.join(OUT_DIR, "task08_fuzzy_summary.csv"), index=False)
+
+# ----------------------------
+# DISTRIBUTION SNAPSHOT (Task 5–6 context)
+# ----------------------------
+hist_counts, hist_edges = np.histogram(vals, bins=60, range=(-0.2, 0.9))
+cdf_x = np.sort(vals)
+cdf_y = np.linspace(0, 1, cdf_x.size, endpoint=True)
+
+pd.DataFrame({"bin_left": hist_edges[:-1], "bin_right": hist_edges[1:], "count": hist_counts})\
+  .to_csv(os.path.join(OUT_DIR, "task08_hist_counts.csv"), index=False)
+pd.DataFrame({"ndvi": cdf_x, "cdf": cdf_y}).to_csv(os.path.join(OUT_DIR, "task08_empirical_cdf.csv"), index=False)
+
+# ----------------------------
+# CLT insight for uncertainty on mean NDVI
+# ----------------------------
+rng = np.random.default_rng(RANDOM_SEED)
+draws = rng.choice(vals, size=MEAN_SAMPLE_N, replace=True)
+hat_mu = float(np.mean(draws))
+hat_sigma = float(np.std(draws, ddof=1))
+
+clt_table = []
+for n in CLT_SIZES:
+    se = hat_sigma / math.sqrt(n)
+    # approx 95% CI via normal
+    ci_lo = hat_mu - 1.96 * se
+    ci_hi = hat_mu + 1.96 * se
+    clt_table.append({"n": n, "mean_hat": hat_mu, "se": se, "ci_lo": ci_lo, "ci_hi": ci_hi})
+pd.DataFrame(clt_table).to_csv(os.path.join(OUT_DIR, "task08_mean_uncertainty.csv"), index=False)
+
+# ----------------------------
+# A SIMPLE PRIORITY SCORE (transparent!)
+# Combine crisp area-fraction (geom_map) and fuzzy mean in each cell
+# ----------------------------
+priority_map = np.full_like(ndvi, np.nan, dtype="float32")
+# compute cell-level fuzzy mean, then score = 0.6*P(NDVI>=t) + 0.4*mean(μ_veg)
+cell_scores = []
+
+for r0, r1, c0, c1 in block_iter(H, W, CELL_PX):
+    gm_block = geom_map[r0:r1, c0:c1]
+    mu_block = fuzzy_map[r0:r1, c0:c1]
+    vmask = np.isfinite(gm_block) & np.isfinite(mu_block)
+    if vmask.sum() == 0:
+        score = np.nan
+    else:
+        score = 0.6 * float(np.nanmean(gm_block)) + 0.4 * float(np.nanmean(mu_block))
+    cell_scores.append({"r0": r0, "r1": r1, "c0": c0, "c1": c1, "score": score})
+    if np.isfinite(score):
+        priority_map[r0:r1, c0:c1] = score
+
+df_scores = pd.DataFrame(cell_scores)
+df_scores.to_csv(os.path.join(OUT_DIR, "task08_priority_scores.csv"), index=False)
+
+# ----------------------------
+# PLOTTING: 1) Geometrical probability map
+# ----------------------------
+plt.figure(figsize=(7.5,5.5))
+plt.imshow(geom_map, vmin=0, vmax=1)
+plt.colorbar(label=f"P(NDVI ≥ {T_THRESH})")
+plt.title("Geometrical Probability by Cell")
+plt.axis("off")
+plt.savefig(os.path.join(MAP_DIR, "geom_prob_map.png"), dpi=150, bbox_inches="tight")
+plt.close()
+
+# 2) Fuzzy μ_veg map
+plt.figure(figsize=(7.5,5.5))
+plt.imshow(fuzzy_map, vmin=0, vmax=1)
+plt.colorbar(label="μ_veg (0..1)")
+plt.title(f"Fuzzy Membership (A={FUZZY_A}, B={FUZZY_B})")
+plt.axis("off")
+plt.savefig(os.path.join(MAP_DIR, "fuzzy_map.png"), dpi=150, bbox_inches="tight")
+plt.close()
+
+# 3) Priority map
+plt.figure(figsize=(7.5,5.5))
+plt.imshow(priority_map, vmin=0, vmax=1)
+plt.colorbar(label="Priority score (0..1)")
+plt.title("Priority Map (0.6·P + 0.4·μ)")
+plt.axis("off")
+plt.savefig(os.path.join(MAP_DIR, "priority_map.png"), dpi=150, bbox_inches="tight")
+plt.close()
+
+# 4) Distribution snapshot + CLT CIs (small panel)
+fig, ax = plt.subplots(figsize=(7.5,4.5))
+ax.hist(vals, bins=60, alpha=0.7)
+ax.set_title("NDVI Histogram (snapshot)")
+ax.set_xlabel("NDVI"); ax.set_ylabel("Frequency")
+txt = "\n".join([f"n={row['n']}: mean≈{hat_mu:.3f}, 95% CI [{row['ci_lo']:.3f}, {row['ci_hi']:.3f}]"
+                  for row in clt_table])
+ax.text(0.02, 0.98, txt, transform=ax.transAxes, va="top", fontsize=9,
+        bbox=dict(facecolor='white', alpha=0.7, edgecolor='none'))
+plt.savefig(os.path.join(MAP_DIR, "distribution_and_CLT.png"), dpi=150, bbox_inches="tight")
+plt.close()
+
+# ----------------------------
+# Console summary
+# ----------------------------
+print("\n=== TASK 8 SYNTHESIS ===")
+print(f"Raster shape: {H}x{W}, valid={vals.size}")
+print(f"Fuzzy μ summary: {json.dumps(fuzzy_summary, indent=2)}")
+print("Mean uncertainty (CLT overlay):")
+for r in clt_table:
+    print(f" n={r['n']:>3d}  mean≈{r['mean_hat']:.3f}  95%CI=[{r['ci_lo']:.3f},{r['ci_hi']:.3f}]")
+print("\nWrote:")
+for p in [
+    os.path.join(MAP_DIR, "geom_prob_map.png"),
+    os.path.join(MAP_DIR, "fuzzy_map.png"),
+    os.path.join(MAP_DIR, "priority_map.png"),
+    os.path.join(MAP_DIR, "distribution_and_CLT.png"),
+]:
+    print(" -", p)
+print(" CSVs: task08_geom_cell_probs.csv, task08_fuzzy_summary.csv, task08_mean_uncertainty.csv, task08_priority_scores.csv, task08_hist_counts.csv, task08_empirical_cdf.csv")
+</pre>
+      </div>
+    </section>
+
+    <!-- INTERPRETATION -->
+    <section class="card" aria-labelledby="interpret">
+      <div class="bar">
+        <div>
+          <span id="interpret" class="subtitle">How to interpret the outputs</span>
+          <div class="hint">Use these points to craft your narrative.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <p><strong>geom_prob_map.png</strong> — Each cell shows <span class="sym">P(NDVI ≥ t)</span>: area‑based (geometrical) probability; supports crisp, regulation‑friendly messaging.</p>
+        <p><strong>fuzzy_map.png</strong> — Shows <span class="sym">μ<sub>veg</sub>∈[0,1]</span>; captures gradual transitions and mixed pixels (ecotones, edges).</p>
+        <p><strong>priority_map.png</strong> — Transparent composite (default <span class="sym">0.6·P + 0.4·μ</span>); high values indicate both ample vegetated area and strong fuzzy condition.</p>
+        <p><strong>distribution_and_CLT.png</strong> — NDVI histogram + approx 95% CIs for mean NDVI at <span class="sym">n∈{10,30,100}</span>; CI width shrinks ~<span class="sym">1/√n</span>.</p>
+      </div>
+    </section>
+
+    <!-- FINAL REPORT PROMPT -->
+    <section class="card" aria-labelledby="report">
+      <div class="bar">
+        <div>
+          <span id="report" class="subtitle">Final‑report prompt (4–6 pages, required)</span>
+          <div class="hint">Copy the outline below into <span class="sym">reports/task08_report.md</span>.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Markdown outline</span>
+          <button id="copyRpt" class="copybtn" onclick="copyCode('rptblk','copyRpt')">Copy</button>
+        </div>
+        <pre id="rptblk"># [Your ROI] — [Your question]
+*(e.g., “Identifying NDVI‑robust zones for seasonal drought resilience”)*
+
+## 1) Question & decision context (½ page)
+- What decision does this analysis support? Who is the audience?
+
+## 2) Evidence chain (1½–2 pages)
+- **Crisp area‑fractions:** Interpret geometrical probability map — where is P(NDVI ≥ t) high/low?
+- **Fuzzy condition:** What patterns emerge in μ_veg? Why is fuzziness appropriate (graded transitions, mixed pixels)?
+- **Distributional shape:** Summarize histogram/CDF — skewness, tails, bimodality (Task 5–6).
+- **Uncertainty:** Use CLT CIs to quantify stability of mean‑NDVI conclusions at different sample sizes.
+
+## 3) Synthesis & prioritization (≈1 page)
+- Defend your priority‑map recipe (weights, threshold t, fuzzy A/B).
+- Highlight 2–3 priority zones and 1–2 watch‑list zones with concise justifications.
+
+## 4) Actionable insight (½–1 page)
+- Recommendations (monitoring transects, field validation, seasonal revisit).
+- Limitations & assumptions (clouds, season window, scale effects).
+
+## Appendix (optional)
+- Parameter table (t, A/B, grid), file paths, checksums.
+</pre>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
