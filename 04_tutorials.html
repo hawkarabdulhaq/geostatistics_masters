@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Task 4 — Geometrical & Fuzzy Probability (NDVI) — University of Szeged</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --accent:#2563eb; --accent-2:#38bdf8; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --shade:rgba(2,6,23,.06); --info:#0ea5e9; --good:#16a34a; --warn:#f59e0b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
+      --accent:#60a5fa; --accent-2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
+      --shade:rgba(255,255,255,.06); --info:#38bdf8; --good:#22c55e; --warn:#fbbf24;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  }
+  .wrap{max-width:1100px; margin-inline:auto}
+
+  /* HEADER */
+  header{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{font-size:.8rem; letter-spacing:.04em; text-transform:uppercase; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:.25rem .5rem; border-radius:999px}
+  h1{margin:0; font-size:1.35rem; font-weight:700}
+  h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
+  .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .logo-chip{display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.35rem .5rem; box-shadow:var(--shadow)}
+  .logo-chip img{display:block; height:42px; width:auto; object-fit:contain}
+  .logo-chip.logo-dept img{height:55px}
+  .logo-chip.logo-szte img{height:42px}
+
+  /* CARDS */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; margin-top:1rem; box-shadow:var(--shadow); overflow:hidden}
+  .bar{padding:.9rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .subtitle{font-weight:600}
+  .hint{color:var(--muted); font-size:.92rem}
+  .btn{border:1px solid var(--border); background:transparent; color:var(--ink); padding:.45rem .7rem; border-radius:10px; cursor:pointer; font-weight:600}
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .call{border-left:4px solid var(--info); background:rgba(14,165,233,.08); padding:.7rem .9rem; border-radius:10px}
+  .ok{color:var(--good); font-weight:700}
+  .warn{color:var(--warn); font-weight:600}
+  .section-pad{padding:1rem}
+  ul,ol{margin:0; padding-left:1.2rem}
+  .small{font-size:.95rem; color:var(--muted)}
+  .sym, code, kbd, pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+
+  /* CODE BLOCKS */
+  .codewrap{position:relative}
+  pre{
+    margin:0; padding:1rem; overflow:auto; background:#0b1020; color:#e6ebf5;
+    line-height:1.4; font-size:.95rem; border-top:1px solid var(--border);
+  }
+  .copybar{
+    display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+    padding:.6rem .75rem; border-bottom:1px solid var(--border); background:var(--card);
+  }
+  .copybtn{border:1px solid var(--border); border-radius:8px; background:transparent; cursor:pointer; font-weight:700; padding:.35rem .6rem}
+  .copybtn:hover{border-color:var(--accent); color:var(--accent)}
+</style>
+<script>
+  function printPage(){ window.print(); }
+  async function copyCode(codeId, btnId){
+    const el = document.getElementById(codeId);
+    const txt = el.innerText;
+    try{
+      await navigator.clipboard.writeText(txt);
+      if(btnId){
+        const b = document.getElementById(btnId);
+        const old = b.textContent; b.textContent = 'Copied ✔';
+        setTimeout(()=> b.textContent = old, 1200);
+      }
+    }catch(e){
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      document.execCommand('copy'); s.removeAllRanges();
+      if(btnId) alert('Code copied.');
+    }
+  }
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HEADER -->
+    <header>
+      <div class="header-top">
+        <div class="title">
+          <span class="badge">University of Szeged</span>
+          <h1>Task 4 — Geometrical & Fuzzy Probability (≈30 min)</h1>
+        </div>
+        <div class="logo-row" aria-label="Department and University logos">
+          <span class="logo-chip logo-dept" title="Department logo">
+            <img src="https://geosci.u-szeged.hu/site/upload/2024/10/logo_v2_2_64x55.png" alt="Department of Atmospheric and Geospatial Data Science logo" />
+          </span>
+          <span class="logo-chip logo-szte" title="SZTE logo">
+            <img src="https://u-szeged.hu/site/design3/img/szte_logo_en.jpg" alt="University of Szeged logo (English)" />
+          </span>
+        </div>
+      </div>
+      <h2>Department of Atmospheric and Geospatial Data Science</h2>
+    </header>
+
+    <!-- OVERVIEW -->
+    <section class="card" aria-labelledby="overview">
+      <div class="bar">
+        <div>
+          <span id="overview" class="subtitle">Overview</span>
+          <div class="hint">Crisp (geometrical) vs fuzzy probability maps from NDVI.</div>
+        </div>
+        <div><button class="btn" onclick="printPage()">Print</button></div>
+      </div>
+      <div class="section-pad">
+        <p><strong>Input:</strong><br/><span class="sym">/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif</span></p>
+        <div class="call">
+          <strong>You will produce:</strong>
+          <ul>
+            <li><strong>Code:</strong> <span class="sym">code/task04_geom_fuzzy.py</span></li>
+            <li><strong>Figures:</strong>
+              <span class="sym">outputs/task04_geom_prob_map.png</span>,
+              <span class="sym">outputs/task04_fuzzy_map.png</span>
+            </li>
+            <li><strong>Report:</strong> <span class="sym">reports/task04_report.md</span> (or PDF)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENDA -->
+    <section class="card" aria-labelledby="agenda">
+      <div class="bar">
+        <div>
+          <span id="agenda" class="subtitle">Agenda & steps</span>
+          <div class="hint">Estimated time: 30–40 minutes total.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ol>
+          <li><strong>0) Setup (1 min)</strong> — install required packages.</li>
+          <li><strong>1) Run the script (4–6 min)</strong> — compute maps.</li>
+          <li><strong>2) Inspect outputs (6–8 min)</strong> — open figures; read console stats.</li>
+          <li><strong>3) Compare crisp vs fuzzy (8–10 min)</strong> — answer guiding questions.</li>
+          <li><strong>4) Write your short report (8–10 min)</strong> — fill the template.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 0) SETUP -->
+    <section class="card" aria-labelledby="setup">
+      <div class="bar">
+        <div>
+          <span id="setup" class="subtitle">0) Setup (1 min)</span>
+          <div class="hint">Install packages if needed.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copy0" class="copybtn" onclick="copyCode('block0','copy0')">Copy code</button>
+        </div>
+        <pre id="block0">pip install rasterio numpy pandas matplotlib
+</pre>
+      </div>
+    </section>
+
+    <!-- 1) RUN -->
+    <section class="card" aria-labelledby="run">
+      <div class="bar">
+        <div>
+          <span id="run" class="subtitle">1) Run the script (4–6 min)</span>
+          <div class="hint">Save, then execute the Python file.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <p>Save the script below as <span class="sym">code/task04_geom_fuzzy.py</span>, then run:</p>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Terminal</span>
+          <button id="copy1" class="copybtn" onclick="copyCode('block1','copy1')">Copy code</button>
+        </div>
+        <pre id="block1">python code/task04_geom_fuzzy.py
+</pre>
+      </div>
+      <div class="section-pad">
+        <p><strong>This computes:</strong></p>
+        <ul>
+          <li><strong>Geometrical probability map:</strong> per ~250 m grid cell, the fraction of pixels with NDVI ≥ t (default <span class="sym">t=0.50</span>).</li>
+          <li><strong>Fuzzy membership map:</strong> <span class="sym">μ<sub>veg</sub>(ndvi)</span> with 0 at ≤0.20, 1 at ≥0.70, linear in‑between.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 2) INSPECT -->
+    <section class="card" aria-labelledby="inspect">
+      <div class="bar">
+        <div>
+          <span id="inspect" class="subtitle">2) Inspect outputs (6–8 min)</span>
+          <div class="hint">Open figures and check the console summary.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li><span class="sym">outputs/task04_geom_prob_map.png</span> — coarse grid heatmap of <span class="sym">P(NDVI ≥ t)</span>.</li>
+          <li><span class="sym">outputs/task04_fuzzy_map.png</span> — continuous <span class="sym">μ<sub>veg</sub> ∈ [0,1]</span>.</li>
+        </ul>
+        <p class="call"><strong>Console summary includes:</strong> approximate pixel size (m), block size (px), mean cell probability, and mean fuzzy μ.</p>
+      </div>
+    </section>
+
+    <!-- 3) COMPARE -->
+    <section class="card" aria-labelledby="compare">
+      <div class="bar">
+        <div>
+          <span id="compare" class="subtitle">3) Compare crisp vs fuzzy (8–10 min)</span>
+          <div class="hint">Use both figures to answer briefly.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li>Where does crisp thresholding (<span class="sym">P ≥ t</span>) show “all‑or‑nothing” behavior?</li>
+          <li>Where does fuzzy <span class="sym">μ</span> reveal gradients that crisp masking hides (ecotones, mixed pixels, edges)?</li>
+          <li>Does changing <span class="sym">t</span> (e.g., 0.4 vs 0.6) flip certain cells from green→non‑green? What does <span class="sym">μ</span> report there?</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4) REPORT -->
+    <section class="card" aria-labelledby="report">
+      <div class="bar">
+        <div>
+          <span id="report" class="subtitle">4) Write your short report (8–10 min)</span>
+          <div class="hint">Create <span class="sym">reports/task04_report.md</span> and paste this template.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Markdown template</span>
+          <button id="copyT" class="copybtn" onclick="copyCode('blockT','copyT')">Copy template</button>
+        </div>
+        <pre id="blockT"># Task 4 — Geometrical & Fuzzy Probability
+
+## Inputs
+- NDVI: ndvi_s2_2024_growing_season.tif
+
+## Parameters
+- Grid ~ 250 m cells (computed from raster resolution)
+- Crisp threshold t = 0.50
+- Fuzzy μ_veg: 0 at 0.20, 1 at 0.70 (linear in-between)
+
+## Findings — Geometrical Probability
+- Mean cell P(NDVI ≥ t): ____
+- Spatial pattern: (where are highest/lowest cells?)
+- Sensitivity to t (if tested): ____
+
+## Findings — Fuzzy Membership
+- Mean μ_veg: ____
+- Areas with gradual transitions: ____
+- What μ captured that crisp missed: ____
+
+## Contrast: Crisp vs Fuzzy
+- When crisp is preferable: (e.g., hard decisions, masks)
+- When fuzzy helps: (gradual transitions, mixed land cover)
+- Recommendation for this ROI: ____
+
+## Next steps
+- Try different cell sizes (e.g., 150 m / 500 m).
+- Adjust fuzzy breakpoints (a,b) based on phenology/land cover.
+</pre>
+      </div>
+    </section>
+
+    <!-- SCRIPT -->
+    <section class="card" aria-labelledby="script">
+      <div class="bar">
+        <div>
+          <span id="script" class="subtitle">The script — <span class="sym">code/task04_geom_fuzzy.py</span> (ready to run)</span>
+          <div class="hint">Uses only: numpy, pandas, matplotlib, rasterio. Writes all outputs listed above.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Python</span>
+          <button id="copyPY" class="copybtn" onclick="copyCode('blockPY','copyPY')">Copy code</button>
+        </div>
+        <pre id="blockPY">import os, math, json
+import numpy as np
+import pandas as pd
+import rasterio as rio
+import matplotlib.pyplot as plt
+
+# ----------------------------
+# CONFIG
+# ----------------------------
+TIF_PATH = "/workspaces/geostatistics_masters/ndvi_s2_2024_growing_season.tif"
+OUT_DIR  = "/workspaces/geostatistics_masters/outputs"
+REPORTS  = "/workspaces/geostatistics_masters/reports"
+os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(REPORTS, exist_ok=True)
+
+# Geometrical probability parameters
+TARGET_CELL_M = 250      # target grid cell size in meters (approx)
+THRESHOLD_T   = 0.50     # crisp threshold for "vegetated": NDVI >= t
+
+# Fuzzy membership parameters: μ_veg(ndvi)
+FUZZY_A = 0.20           # μ=0 at ndvi <= A
+FUZZY_B = 0.70           # μ=1 at ndvi >= B
+
+# ----------------------------
+# Helpers
+# ----------------------------
+def meters_per_degree_lat(phi_rad: float) -> float:
+    # Reasonable approximation
+    return 111320.0
+
+def meters_per_degree_lon(phi_rad: float) -> float:
+    return 111320.0 * math.cos(phi_rad)
+
+def pixel_size_meters(src):
+    """
+    Returns (px_w_m, px_h_m, lat_center_deg). Works for projected (meter) and geographic (degree) CRSs.
+    """
+    transform = src.transform
+    h, w = src.height, src.width
+    crs = src.crs
+
+    px_w = abs(transform.a)
+    px_h = abs(transform.e)
+
+    # center latitude (for geographic CRS)
+    cx = w / 2.0
+    cy = h / 2.0
+    # x = a*col + c ; y = e*row + f (assuming north-up, b=d=0)
+    lat_center = transform.f + transform.e * cy
+
+    if crs is not None and not crs.is_geographic:
+        # projected in meters
+        return px_w, px_h, lat_center
+    else:
+        # geographic degrees → meters using center latitude
+        phi = math.radians(lat_center)
+        mx = meters_per_degree_lon(phi)
+        my = meters_per_degree_lat(phi)
+        return px_w * mx, px_h * my, lat_center
+
+def block_fraction_event(ndvi, cell_h, cell_w, thresh):
+    """
+    Compute per-block fraction of NDVI >= thresh (ignoring NaN).
+    Returns (frac_map[nrows,ncols], valid_count_map).
+    """
+    H, W = ndvi.shape
+    Hc = (H // cell_h) * cell_h
+    Wc = (W // cell_w) * cell_w
+    if Hc == 0 or Wc == 0:
+        raise ValueError("Grid cell size too large for raster dimensions.")
+
+    sub = ndvi[:Hc, :Wc]
+    valid = np.isfinite(sub)
+    event = (sub >= thresh) & valid
+
+    nrows = Hc // cell_h
+    ncols = Wc // cell_w
+
+    # reshape to 4D blocks: (nrows, cell_h, ncols, cell_w)
+    valid_counts = valid.reshape(nrows, cell_h, ncols, cell_w).sum(axis=(1,3)).astype(float)
+    event_counts = event.reshape(nrows, cell_h, ncols, cell_w).sum(axis=(1,3)).astype(float)
+
+    with np.errstate(divide='ignore', invalid='ignore'):
+        frac = event_counts / valid_counts
+        frac[valid_counts == 0] = np.nan
+
+    return frac, valid_counts
+
+def fuzzy_membership(ndvi, a, b):
+    """
+    μ_veg(ndvi): 0 at <=a ; 1 at >=b ; linear in between.
+    Returns μ with NaN where ndvi is NaN.
+    """
+    mu = np.full_like(ndvi, np.nan, dtype="float32")
+    valid = np.isfinite(ndvi)
+    x = ndvi[valid]
+
+    mu_valid = np.zeros_like(x, dtype="float32")
+    # in-between linear ramp
+    mid = (x > a) & (x < b)
+    mu_valid[mid] = (x[mid] - a) / (b - a)
+    mu_valid[x >= b] = 1.0
+    # x <= a already 0.0
+
+    mu[valid] = mu_valid
+    # clamp (safety)
+    mu[valid] = np.clip(mu[valid], 0.0, 1.0)
+    return mu
+
+# ----------------------------
+# Load NDVI
+# ----------------------------
+assert os.path.exists(TIF_PATH), f"File not found: {TIF_PATH}"
+with rio.open(TIF_PATH) as src:
+    profile = src.profile.copy()
+    ndvi = src.read(1).astype("float32")
+    nodata = src.nodata
+    px_w_m, px_h_m, lat_c = pixel_size_meters(src)
+
+if nodata is not None:
+    ndvi = np.where(ndvi == nodata, np.nan, ndvi)
+
+valid_mask = np.isfinite(ndvi)
+assert valid_mask.any(), "No valid NDVI pixels found."
+
+# Determine cell size in pixels to approximate TARGET_CELL_M
+cell_w_px = max(1, int(round(TARGET_CELL_M / px_w_m)))
+cell_h_px = max(1, int(round(TARGET_CELL_M / px_h_m)))
+
+# ----------------------------
+# Geometrical probability: per-cell P(NDVI >= t)
+# ----------------------------
+geom_frac, valid_counts = block_fraction_event(ndvi, cell_h_px, cell_w_px, THRESHOLD_T)
+geom_stats = {
+    "cell_size_target_m": TARGET_CELL_M,
+    "pixel_size_m_x": px_w_m,
+    "pixel_size_m_y": px_h_m,
+    "approx_cell_w_px": cell_w_px,
+    "approx_cell_h_px": cell_h_px,
+    "mean_cell_prob": float(np.nanmean(geom_frac)),
+    "median_cell_prob": float(np.nanmedian(geom_frac)),
+    "min_cell_prob": float(np.nanmin(geom_frac)),
+    "max_cell_prob": float(np.nanmax(geom_frac)),
+    "threshold_t": THRESHOLD_T,
+    "lat_center_deg": float(lat_c),
+}
+with open(os.path.join(OUT_DIR, "task04_geom_stats.json"), "w") as f:
+    json.dump(geom_stats, f, indent=2)
+
+plt.figure()
+plt.imshow(geom_frac, vmin=0, vmax=1)
+plt.colorbar(label=f"P(NDVI ≥ {THRESHOLD_T}) per ~{TARGET_CELL_M} m cell")
+plt.title("Geometrical Probability Map")
+plt.axis("off")
+plt.savefig(os.path.join(OUT_DIR, "task04_geom_prob_map.png"), dpi=150, bbox_inches="tight")
+plt.close()
+
+# ----------------------------
+# Fuzzy membership: μ_veg(ndvi)
+# ----------------------------
+mu = fuzzy_membership(ndvi, FUZZY_A, FUZZY_B)
+mu_stats = {
+    "fuzzy_a": FUZZY_A,
+    "fuzzy_b": FUZZY_B,
+    "mean_mu": float(np.nanmean(mu)),
+    "median_mu": float(np.nanmedian(mu)),
+    "min_mu": float(np.nanmin(mu)),
+    "max_mu": float(np.nanmax(mu)),
+}
+with open(os.path.join(OUT_DIR, "task04_fuzzy_stats.json"), "w") as f:
+    json.dump(mu_stats, f, indent=2)
+
+plt.figure()
+plt.imshow(mu, vmin=0, vmax=1)
+plt.colorbar(label="μ_veg (0–1)")
+plt.title("Fuzzy Vegetation Membership Map")
+plt.axis("off")
+plt.savefig(os.path.join(OUT_DIR, "task04_fuzzy_map.png"), dpi=150, bbox_inches="tight")
+plt.close()
+
+# ----------------------------
+# Console summary
+# ----------------------------
+print("\n=== TASK 4 SUMMARY ===")
+print("Geometrical probability (per-cell):")
+for k, v in geom_stats.items():
+    print(f"  {k}: {v}")
+print("\nFuzzy membership:")
+for k, v in mu_stats.items():
+    print(f"  {k}: {v}")
+
+print("\nWrote:")
+print(f"  - {os.path.join(OUT_DIR, 'task04_geom_prob_map.png')}")
+print(f"  - {os.path.join(OUT_DIR, 'task04_fuzzy_map.png')}")
+print(f"  - {os.path.join(OUT_DIR, 'task04_geom_stats.json')}")
+print(f"  - {os.path.join(OUT_DIR, 'task04_fuzzy_stats.json')}")
+</pre>
+      </div>
+    </section>
+
+    <!-- FINAL PROMPT -->
+    <section class="card" aria-labelledby="prompt">
+      <div class="bar">
+        <div>
+          <span id="prompt" class="subtitle">Final‑report prompt (paste into your report)</span>
+          <div class="hint">Use these guiding questions to conclude.</div>
+        </div>
+      </div>
+      <div class="codewrap">
+        <div class="copybar">
+          <span class="small">Prompt</span>
+          <button id="copyFP" class="copybtn" onclick="copyCode('blockFP','copyFP')">Copy prompt</button>
+        </div>
+        <pre id="blockFP">Contrast crisp vs fuzzy for this ROI:
+
+Where did crisp P(NDVI ≥ t) give confident “vegetated vs not” decisions?
+Where did μ_veg expose gradual transitions or mixed pixels?
+When is fuzziness helpful?
+Discuss ecotones, mixed land cover, sensor noise, edges, or seasonal transitions.
+
+Parameter sensitivity:
+How would results change if t = 0.4 or 0.6? If (A,B) = (0.15, 0.65) vs (0.25, 0.75)?
+
+Actionable note:
+For mapping/monitoring in this ROI, would you recommend crisp masks, fuzzy scores, or both
+(e.g., fuzzy for analysis, crisp for deployment)?
+</pre>
+      </div>
+    </section>
+
+    <!-- OPTIONAL -->
+    <section class="card" aria-labelledby="optional">
+      <div class="bar">
+        <div>
+          <span id="optional" class="subtitle">Optional extensions (if time allows)</span>
+          <div class="hint">Ideas to explore sensitivity and robustness.</div>
+        </div>
+      </div>
+      <div class="section-pad">
+        <ul>
+          <li>Try different cell sizes: set <span class="sym">TARGET_CELL_M = 150</span> or <span class="sym">500</span>.</li>
+          <li>Compare multiple thresholds <span class="sym">t</span> in one run and chart cell‑wise sensitivity.</li>
+          <li>Write a CSV of per‑cell probabilities for downstream mapping (extend from <span class="sym">geom_frac</span>).</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
