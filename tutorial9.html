@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tutorial — Foundations of Statistical Thinking with NDVI (EN/HU) — University of Szeged</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --accent:#2563eb; --accent2:#38bdf8; --border:#e2e8f0; --shadow:0 10px 30px rgba(2,6,23,.08);
+    --chipbg:rgba(56,189,248,.15);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#101726; --ink:#e6ebf5; --muted:#95a3b8;
+      --accent:#60a5fa; --accent2:#22d3ee; --border:#1f2a44; --shadow:0 10px 30px rgba(0,0,0,.5);
+      --chipbg:rgba(96,165,250,.18);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:2rem; background:var(--bg); color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  }
+  .wrap{max-width:1100px; margin-inline:auto}
+
+  /* HEADER */
+  header{
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color:#fff; border-radius:16px; padding:1rem 1.25rem; box-shadow:var(--shadow);
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .title{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .badge{
+    font-size:.8rem; letter-spacing:.04em; text-transform:uppercase;
+    background: rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:.25rem .5rem; border-radius:999px;
+  }
+  h1{margin:0; font-size:1.35rem; font-weight:700}
+  h2{margin:.25rem 0 0; font-size:1rem; font-weight:500; opacity:.95}
+  .logo-row{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+  .logo-chip{display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:.35rem .5rem; box-shadow:var(--shadow)}
+  .logo-chip img{display:block; height:42px; width:auto; object-fit:contain}
+  .logo-chip.logo-dept img{height:55px}
+  .logo-chip.logo-szte img{height:42px}
+
+  /* CARDS */
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    margin-top:1rem; box-shadow:var(--shadow); overflow:hidden;
+  }
+  .bar{
+    padding:.9rem 1rem; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  }
+  .subtitle{font-weight:700}
+  .hint{color:var(--muted); font-size:.92rem}
+
+  .section{padding:1rem}
+  .section + .section{border-top:1px solid var(--border)}
+  .lang-chip{
+    display:inline-block; font-size:.72rem; font-weight:800; letter-spacing:.04em;
+    padding:.18rem .5rem; border-radius:6px; background:var(--chipbg); color:#0369a1; border:1px solid var(--border);
+    margin-right:.45rem;
+  }
+  .stack{margin:.25rem 0 .5rem}
+  .stack .en, .stack .hu{margin:.15rem 0}
+
+  /* CODE */
+  pre, code, kbd{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  pre{
+    background:#0b1220; color:#e5e7eb; padding:.9rem 1rem; border-radius:12px; overflow:auto; margin:.6rem 0;
+  }
+  .copyrow{display:flex; gap:.5rem; align-items:center; justify-content:flex-end}
+  .btn{
+    border:1px solid var(--border); background:transparent; color:var(--ink);
+    padding:.45rem .7rem; border-radius:10px; cursor:pointer; font-weight:600;
+  }
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .btn.primary{background:var(--accent); color:#fff; border-color:transparent}
+  .btn.primary:hover{filter:brightness(1.05)}
+  .grid2{display:grid; grid-template-columns:1fr; gap:1rem}
+  @media (min-width:860px){ .grid2{grid-template-columns:1fr 1fr} }
+  ul{margin:.35rem 0 .75rem}
+  li{margin:.2rem 0}
+  .pill{display:inline-block; padding:.2rem .5rem; border-radius:999px; border:1px solid var(--border); background:rgba(148,163,184,.08); font-size:.8rem}
+  table{width:100%; border-collapse:separate; border-spacing:0}
+  th, td{padding:.6rem .7rem; border-bottom:1px solid var(--border); vertical-align:top}
+  thead th{background:linear-gradient(180deg, rgba(37,99,235,.08), rgba(56,189,248,.08)); text-align:left}
+  .tight li{margin:.15rem 0}
+  .kbd{background:#111827; color:#f3f4f6; padding:.08rem .35rem; border-radius:6px}
+  .note{color:var(--muted); font-size:.9rem}
+  @media (max-width:720px){ body{padding:1rem} }
+</style>
+<script>
+  function copyFrom(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    const text = el.innerText;
+    navigator.clipboard.writeText(text).then(()=>alert('Copied!')).catch(()=>{});
+  }
+  function printPage(){ window.print(); }
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-top">
+        <div class="title">
+          <span class="badge">University of Szeged</span>
+          <h1>Tutorial — Foundations of Statistical Thinking with NDVI (EN/HU)</h1>
+        </div>
+        <div class="logo-row" aria-label="Department and University logos">
+          <span class="logo-chip logo-dept" title="Department logo">
+            <img src="https://geosci.u-szeged.hu/site/upload/2024/10/logo_v2_2_64x55.png" alt="Department of Atmospheric and Geospatial Data Science logo">
+          </span>
+          <span class="logo-chip logo-szte" title="SZTE logo">
+            <img src="https://u-szeged.hu/site/design3/img/szte_logo_en.jpg" alt="University of Szeged logo (English)">
+          </span>
+        </div>
+      </div>
+      <h2>Goal: run <span class="pill">ndvi_foundations.py</span> on an NDVI GeoTIFF and write a concise, evidence‑based report.</h2>
+    </header>
+
+    <!-- Overview -->
+    <section class="card">
+      <div class="bar">
+        <div class="subtitle">Tutorial Overview / Áttekintés</div>
+        <div><button class="btn" onclick="printPage()">Print</button></div>
+      </div>
+      <div class="section">
+        <div class="stack">
+          <div class="en"><span class="lang-chip">EN</span><strong>Foundations topics to address in your report:</strong> Deterministic vs. Stochastic Models · What is Statistics (vs. Mathematics) · Population & Statistical Sample · Random Variables (1‑variable).</div>
+          <div class="hu"><span class="lang-chip">HU</span><strong>A jelentésben tárgyalandó alapok:</strong> Determinisztikus vs. sztochasztikus modellek · Mi a statisztika (szemben a matematikával) · Sokaság & statisztikai minta · Valószínűségi változó (egyváltozós).</div>
+        </div>
+
+        <div class="grid2">
+          <div>
+            <p class="stack">
+              <span class="lang-chip">EN</span><strong>Script example (path edit required):</strong> see <a href="https://github.com/hawkarabdulhaq/geostatistics_masters/blob/main/statistical_thinking.py" target="_blank" rel="noopener">statistical_thinking.py</a>.  
+              Save/use your own <code>ndvi_foundations.py</code> script for this tutorial.
+            </p>
+            <p class="stack">
+              <span class="lang-chip">HU</span><strong>Script példa (útvonalat módosítani kell):</strong> lásd <a href="https://github.com/hawkarabdulhaq/geostatistics_masters/blob/main/statistical_thinking.py" target="_blank" rel="noopener">statistical_thinking.py</a>.  
+              Ehhez az anyaghoz a saját <code>ndvi_foundations.py</code> scriptedet használd.
+            </p>
+          </div>
+          <div>
+            <ul class="tight">
+              <li><span class="pill">Deterministic</span> → single‑value summaries (point estimates)</li>
+              <li><span class="pill">Stochastic</span> → bootstrap distributions & confidence intervals</li>
+              <li><span class="pill">Sampling</span> → LLN demo & biased vs random selection</li>
+              <li><span class="pill">Maps</span> → classes & area by class (equal‑area projection)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 0) Setup & Data -->
+    <section class="card">
+      <div class="bar">
+        <div class="subtitle">0) Setup &amp; Data / Környezet &amp; adatok</div>
+      </div>
+      <div class="section">
+        <div class="grid2">
+          <div>
+            <p class="stack"><span class="lang-chip">EN</span><strong>Prerequisites:</strong> Python 3.9+ · Packages: <code>rasterio</code>, <code>numpy</code>, <code>pandas</code>, <code>matplotlib</code>.</p>
+            <p class="stack"><span class="lang-chip">HU</span><strong>Előfeltételek:</strong> Python 3.9+ · Csomagok: <code>rasterio</code>, <code>numpy</code>, <code>pandas</code>, <code>matplotlib</code>.</p>
+            <ul class="tight">
+              <li><span class="lang-chip">EN</span><strong>Script:</strong> use your saved <code>ndvi_foundations.py</code>.</li>
+              <li><span class="lang-chip">HU</span><strong>Script:</strong> a korábban elmentett <code>ndvi_foundations.py</code> fájlt használd.</li>
+              <li><span class="lang-chip">EN</span><strong>Your raster:</strong> choose an NDVI GeoTIFF for your area of interest.</li>
+              <li><span class="lang-chip">HU</span><strong>Raszter:</strong> válassz NDVI GeoTIFF‑et a vizsgált területhez.</li>
+            </ul>
+          </div>
+          <div>
+            <div class="copyrow">
+              <button class="btn" onclick="copyFrom('cmd')">Copy command</button>
+            </div>
+            <pre id="cmd">python ndvi_foundations.py "/path/to/your/ndvi.tif" \
+  --out ndvi_foundations_report \
+  --thresholds 0.2 0.3 0.5 \
+  --boot 1000 \
+  --seed 42</pre>
+            <p class="note">Tip / Tipp: If landscape differs, adjust <code>--thresholds</code> (e.g., <code>0.1 0.25 0.4</code>) and re‑run.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Outputs -->
+    <section class="card">
+      <div class="bar">
+        <div class="subtitle">What gets created (key files) / Kimenetek (fő fájlok)</div>
+      </div>
+      <div class="section">
+        <div class="grid2">
+          <div>
+            <h4>Descriptive / Deterministic</h4>
+            <ul>
+              <li><code>deterministic_stats.csv</code> — count, min, quantiles, mean, std</li>
+              <li><code>ndvi_histogram.png</code>, <code>ndvi_ecdf.png</code></li>
+              <li><code>deterministic_area_proportions.csv</code> — prop NDVI ≥ thresholds</li>
+            </ul>
+
+            <h4>Uncertainty / Stochastic</h4>
+            <ul>
+              <li><code>bootstrap_draws.csv</code>, <code>bootstrap_confidence_intervals.csv</code></li>
+              <li><code>bootstrap_distributions.png</code></li>
+            </ul>
+          </div>
+          <div>
+            <h4>Sampling Concepts</h4>
+            <ul>
+              <li><code>lln_error_vs_n.png</code>, <code>lln_sampling_errors.csv</code></li>
+              <li><code>biased_vs_random.png</code>, <code>biased_vs_random.csv</code></li>
+            </ul>
+
+            <h4>Map & Areas by Class</h4>
+            <ul>
+              <li><code>ndvi_classes.tif</code> (paletted), <code>ndvi_classes.png</code> (legend)</li>
+              <li><code>ndvi_area_by_class.csv</code>, <code>ndvi_area_by_class.png</code> (equal‑area EPSG:6933)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2) Deliverables -->
+    <section class="card">
+      <div class="bar">
+        <div class="subtitle">2) Deliverables / Leadandók</div>
+      </div>
+      <div class="section">
+        <div class="stack">
+          <div class="en"><span class="lang-chip">EN</span>Submit a <strong>PDF report (≤ 4 pages)</strong> plus the <code>ndvi_foundations_report/</code> output folder as ZIP. Tie each section to outputs (numbers/figures) from your run.</div>
+          <div class="hu"><span class="lang-chip">HU</span>Küldj be <strong>PDF jelentést (≤ 4 oldal)</strong> és a <code>ndvi_foundations_report/</code> kimeneti mappát ZIP‑ben. Minden szakasz hivatkozzon a futásod eredményeire.</div>
+        </div>
+
+        <!-- Section A-D guidance -->
+        <h3>A — Deterministic vs. Stochastic Models (~1 page)</h3>
+        <ul>
+          <li><span class="lang-chip">EN</span>Deterministic: report mean, median, p25/p75, std from <code>deterministic_stats.csv</code>; reference <code>ndvi_histogram.png</code>, <code>ndvi_ecdf.png</code>. Explain these are point estimates.</li>
+          <li><span class="lang-chip">HU</span>Determin. értékek: átlag, medián, p25/p75, szórás; hivatkozz <code>ndvi_histogram.png</code>, <code>ndvi_ecdf.png</code>. Ezek pontbecslések.</li>
+          <li><span class="lang-chip">EN</span>Stochastic: use <code>bootstrap_confidence_intervals.csv</code> to report 95% CIs (mean, median, p95, prop_ge_thresholds); reference <code>bootstrap_distributions.png</code>; explain why intervals capture uncertainty.</li>
+          <li><span class="lang-chip">HU</span>Sztochasztikus: 95%-os konfidenciaintervallumok (átlag, medián, p95, küszöbarányok); hivatkozz <code>bootstrap_distributions.png</code>-ra; magyarázd a bizonytalanság szerepét.</li>
+        </ul>
+        <p class="note"><strong>Interpretation prompt / Értelmezési kérdés:</strong> If the deterministic mean is <em>μ̂</em> but the 95% CI is [L,U], what does this say about uncertainty? Compare deterministic prop(NDVI ≥ 0.3) to its CI: could a small management decision be sensitive?</p>
+
+        <h3>B — What is Statistics (vs. Mathematics) (~½ page)</h3>
+        <ul>
+          <li><span class="lang-chip">EN</span>Explain, grounded in your outputs, how statistics uses observed data and quantifies uncertainty, while mathematics treats exact abstract relations. Use one concrete CI example.</li>
+          <li><span class="lang-chip">HU</span>Magyarázd el az eredményeidre támaszkodva: a statisztika megfigyelt adatokból dolgozik és a bizonytalanságot méri, míg a matematika absztrakt, pontos összefüggésekkel.</li>
+        </ul>
+
+        <h3>C — Population & Statistical Sample (~1 page)</h3>
+        <ul>
+          <li><span class="lang-chip">EN</span>Population: all valid NDVI pixels. Report <code>count_valid</code> from <code>deterministic_stats.csv</code>.</li>
+          <li><span class="lang-chip">HU</span>Sokaság: az összes érvényes NDVI pixel. Jelentsd a <code>count_valid</code>-ot.</li>
+          <li><span class="lang-chip">EN</span>Bootstrap: resamples observed pixels with replacement → approximates sampling variability.</li>
+          <li><span class="lang-chip">HU</span>Bootstrap: visszatevéses újramintavétel → mintavételi ingadozás közelítése.</li>
+          <li><span class="lang-chip">EN</span>LLN demo (<code>lln_error_vs_n.png</code>): summarize how median & 95th‑percentile abs. error of sample mean shrink as <em>n</em> grows. Make a concrete statement (e.g., from n=100 to n=10,000…).</li>
+          <li><span class="lang-chip">HU</span>NSzT demó: mutasd meg, hogyan csökken a medián és 95. percentilis hiba az <em>n</em> növekedésével; írj konkrét számokat.</li>
+          <li><span class="lang-chip">EN</span>Biased vs random (<code>biased_vs_random.png</code>): compare means; state whether the quadrant looks greener/less green and how bias persists with <em>n</em>.</li>
+          <li><span class="lang-chip">HU</span>Torz vs véletlen: hasonlítsd össze az átlagokat; írd le a négyzet zöldebb/szárazabb jellegét és a torzítás maradandóságát.</li>
+        </ul>
+
+        <h3>D — Random Variables (1‑variable) (~½–1 page)</h3>
+        <ul>
+          <li><span class="lang-chip">EN</span>Treat NDVI at a random valid pixel as X. Use histogram/ECDF to describe center, spread, skew/modes.</li>
+          <li><span class="lang-chip">HU</span>Tekintsd az NDVI‑t véletlen változónak (X). A hisztogram/ECDF alapján írd le a középet, szóródást, ferdeséget/multimodalitást.</li>
+          <li><span class="lang-chip">EN</span>Use <code>ndvi_area_by_class.csv</code> & <code>ndvi_classes.png</code> to discuss geographic structure (area per class, km²) and how it matches the distribution.</li>
+          <li><span class="lang-chip">HU</span>Használd az <code>ndvi_area_by_class.csv</code>-t és a térképet az osztályterületek (km²) és a megoszlás kapcsolatának értelmezéséhez.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3) Report template -->
+    <section class="card">
+      <div class="bar">
+        <div class="subtitle">3) Report Template / Jelentéssablon</div>
+        <div class="copyrow"><button class="btn" onclick="copyFrom('tpl')">Copy template</button></div>
+      </div>
+      <div class="section">
+<pre id="tpl">Title: Foundations of Statistical Thinking with NDVI (Your Area)
+
+Data & Run Settings
+GeoTIFF path: ".../your.tif"
+Thresholds: [ ... ]
+Bootstrap reps: ...
+Seed: ...
+
+A. Deterministic vs. Stochastic
+Deterministic stats: mean …, median …, p25 …, p75 …, std …
+95% CIs: mean [L,U], median [L,U], p95 [L,U], prop_ge_… [L,U]
+Figures: ndvi_histogram.png, ndvi_ecdf.png, bootstrap_distributions.png
+Brief interpretation (3–5 sentences).
+
+B. What is Statistics vs. Mathematics
+Short explanation (3–6 sentences) linked to your CI results.
+
+C. Population & Sample
+Population size (valid pixels): …
+LLN: observations from lln_error_vs_n.png (with numbers)
+Biased vs random: differences & implications (biased_vs_random.png).
+
+D. Random Variable
+Histogram & ECDF: distributional shape.
+Area by class: top 3 takeaways (ndvi_area_by_class.csv, ndvi_classes.png).
+
+References to Output Files:
+- deterministic_stats.csv
+- deterministic_area_proportions.csv
+- bootstrap_confidence_intervals.csv
+- lln_sampling_errors.csv
+- biased_vs_random.csv
+- ndvi_area_by_class.csv</pre>
+      </div>
+    </section>
+
+    <!-- 4) Grading rubric -->
+    <section class="card">
+      <div class="bar"><div class="subtitle">4) Grading Rubric (100 pts) / Értékelés</div></div>
+      <div class="section">
+        <table>
+          <thead><tr><th>Category / Kategória</th><th>Points / Pont</th><th>Summary / Leírás</th></tr></thead>
+          <tbody>
+            <tr><td>Execution & Reproducibility</td><td>10</td><td>Script runs; outputs bundled; thresholds/seed noted. / Futtatható, kimenetek mellékelve, beállítások rögzítve.</td></tr>
+            <tr><td>Deterministic vs. Stochastic</td><td>30</td><td>Correct stats + CIs; explains uncertainty; figures support claims. / Helyes statisztikák és CI‑k, jó magyarázat.</td></tr>
+            <tr><td>Statistics vs. Mathematics</td><td>10</td><td>Concise contrast grounded in results. / Rövid, pontos összevetés az eredményekhez kötve.</td></tr>
+            <tr><td>Population & Sample</td><td>30</td><td>Population defined; LLN trend quantified; bias demo interpreted. / Sokaság, NSzT, torzítás helyes értelmezése.</td></tr>
+            <tr><td>Random Variable</td><td>15</td><td>Distribution described; class areas accurate; map used. / Megoszlás leírása; osztály‑területek; térkép hivatkozás.</td></tr>
+            <tr><td>Clarity & Brevity</td><td>5</td><td>≤ 4 pages; tidy tables/figures; file names cited. / ≤ 4 oldal; rendezett ábrák; fájlnevek.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5) Pitfalls -->
+    <section class="card">
+      <div class="bar"><div class="subtitle">5) Common Pitfalls / Gyakori hibák</div></div>
+      <div class="section">
+        <ul>
+          <li><span class="lang-chip">EN</span><strong>Misreading CIs:</strong> A 95% CI is a procedure‑based interval that would cover the true value in 95% of repeated samples—not a 95% chance your single interval is correct.</li>
+          <li><span class="lang-chip">HU</span><strong>CI félreértése:</strong> A 95%‑os CI olyan eljárás eredménye, amely a minták 95%‑ában lefedi az igaz értéket—nem azt jelenti, hogy 95% az esély, hogy ez az egy intervallum igaz.</li>
+          <li><span class="lang-chip">EN</span><strong>Bias ≠ solved by large n:</strong> If sampling is biased (e.g., one quadrant), increasing <em>n</em> may not remove bias.</li>
+          <li><span class="lang-chip">HU</span><strong>Torzítás ≠ nagy minta megoldja:</strong> Ha a mintavétel torz (pl. egyetlen negyed), az <em>n</em> növelése sem feltétlen javítja.</li>
+          <li><span class="lang-chip">EN</span><strong>Thresholds:</strong> If thresholds mismatch landscape, justify alternatives and re‑run.</li>
+          <li><span class="lang-chip">HU</span><strong>Küszöbök:</strong> Ha a küszöbök nem illenek a tájhoz, indokold az új készletet és futtasd újra.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
