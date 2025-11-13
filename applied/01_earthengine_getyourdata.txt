@@ -1,0 +1,65 @@
+// -------------------------------------
+// 0. Define your study area
+// -------------------------------------
+// Make sure this exists from the Imports panel:
+/// var geometry = /* color: #d63000 */ ee.Geometry.Polygon([...]);
+
+var studyArea = geometry;  // or geometry1, etc.
+
+// -------------------------------------
+// 1. Load Sentinel-2 SR (HARMONIZED)
+// -------------------------------------
+var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+  .filterBounds(studyArea)
+  .filterDate('2023-05-01', '2023-09-30')
+  .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 40));  // be a bit less strict
+
+// Debug: how many images?
+print('S2 collection size:', s2.size());
+print('First image:', s2.first());
+
+// If this prints 0, your filters (date/area/cloud) are too strict.
+
+// -------------------------------------
+// 2. Quick check: show RGB composite
+// -------------------------------------
+var s2Median = s2.median().clip(studyArea);
+
+var rgbVis = {
+  bands: ['B4', 'B3', 'B2'],
+  min: 0,
+  max: 3000,
+};
+
+Map.centerObject(studyArea, 11);
+Map.addLayer(s2Median, rgbVis, 'S2 RGB (median)');
+
+// -------------------------------------
+// 3. Compute NDVI
+// -------------------------------------
+// NDVI = (B8 - B4) / (B8 + B4)
+var ndvi = s2Median
+  .normalizedDifference(['B8', 'B4'])
+  .rename('NDVI');
+
+var ndviVis = {
+  min: -0.2,
+  max: 0.8,
+  palette: ['brown', 'yellow', 'green'],
+};
+
+Map.addLayer(ndvi, ndviVis, 'NDVI (median)');
+
+// -------------------------------------
+// 4. Export to Google Drive
+// -------------------------------------
+Export.image.toDrive({
+  image: ndvi,
+  description: 'NDVI_Szeged_polygon',
+  folder: 'earthengine',       // optional Drive folder
+  fileNamePrefix: 'ndvi_szeged',
+  region: studyArea,
+  scale: 10,                   // Sentinel-2 resolution
+  crs: 'EPSG:4326',
+  maxPixels: 1e13
+});
